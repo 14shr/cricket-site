@@ -1,0 +1,9 @@
+# This file configures the build and deployment settings for Netlify.
+# It uses the official Netlify plugin for Next.js to enable all features,
+# including server-side rendering, which is required for the AI flows.
+
+[build]
+  command = "npm run build"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
