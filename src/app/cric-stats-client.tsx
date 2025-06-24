@@ -104,35 +104,33 @@ export default function CricketStatsClient() {
           {data && !loading && <PlayerStatsTable data={data} />}
         </div>
         
-        {/* Show feature cards if there is no data to display */}
-        {!data && !loading && !error && (
-            <div className="grid gap-6 lg:grid-cols-3">
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Live Scores</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-sm text-muted-foreground">Stay updated with real-time match scores and updates.</p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Player Stats</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-sm text-muted-foreground">Access detailed stats and profiles of your favorite players.</p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Match Calendar</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-sm text-muted-foreground">View upcoming fixtures and previous results.</p>
-                    </CardContent>
-                </Card>
-            </div>
-        )}
+        {/* Show feature cards */}
+        <div className="grid gap-6 md:grid-cols-3">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Live Scores</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-sm text-muted-foreground">Stay updated with real-time match scores and updates.</p>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Player Stats</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-sm text-muted-foreground">Access detailed stats and profiles of your favorite players.</p>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Match Calendar</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-sm text-muted-foreground">View upcoming fixtures and previous results.</p>
+                </CardContent>
+            </Card>
+        </div>
       </div>
 
       {/* Highlights Section */}
