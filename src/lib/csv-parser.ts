@@ -42,8 +42,8 @@ function parseCSV(csv: string): Record<string, string>[] {
 function mapRowToPlayerStats(row: Record<string, string>): PlayerStats {
   return {
     name: row['fullname'] || 'N/A',
-    country: row['country_name'] || 'N/A',
-    role: row['position_name'] || 'N/A',
+    country: row['continer'] || 'N/A',
+    role: row['position'] || 'N/A',
     image: row['image_path'] || null,
     summary: `Found player data for ${row['fullname']} in the local CSV file.`,
     rankings: {
