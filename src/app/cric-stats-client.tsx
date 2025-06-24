@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import type { DisambiguatePlayerStatsOutput } from '@/ai/flows/disambiguate-player-stats';
-import { getPlayerStatsAction, getLatestVideosAction } from '@/app/actions';
+import { getPlayerStatsAction } from '@/app/actions';
 import { SearchForm } from '@/components/search-form';
 import { PlayerStatsTable } from '@/components/player-stats-table';
 import { LoadingSkeleton } from '@/components/loading-skeleton';
@@ -25,19 +25,25 @@ export default function CricketStatsClient() {
   useEffect(() => {
     async function fetchInitialData() {
       setVideosLoading(true);
-      const videosResult = await getLatestVideosAction();
-      if (videosResult.error) {
-          console.error(videosResult.error);
+      try {
+        const response = await fetch('/api/videos');
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to fetch videos');
+        }
+        const data = await response.json();
+        setLatestVideos(data);
+      } catch (err: any) {
+          console.error(err.message);
           toast({
               variant: 'destructive',
               title: 'Could not fetch videos.',
-              description: videosResult.error,
+              description: err.message,
           });
           setLatestVideos([]);
-      } else {
-          setLatestVideos(videosResult.data);
+      } finally {
+          setVideosLoading(false);
       }
-      setVideosLoading(false);
     }
     fetchInitialData();
   }, [toast]);

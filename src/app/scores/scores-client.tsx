@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getLiveMatchesAction } from '@/app/actions';
 import { LiveMatchesList } from '@/components/live-matches-list';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -18,18 +17,24 @@ export default function ScoresClient() {
     async function fetchLiveScores() {
       setLoading(true);
       setError(null);
-      const result = await getLiveMatchesAction();
-      if (result.error) {
-        setError(result.error);
+      try {
+        const response = await fetch('/api/scores');
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to fetch live scores');
+        }
+        const data = await response.json();
+        setMatches(data);
+      } catch(err: any) {
+        setError(err.message);
         toast({
           variant: 'destructive',
           title: 'Could not fetch live scores.',
-          description: result.error,
+          description: err.message,
         });
-      } else {
-        setMatches(result.data);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
     fetchLiveScores();
   }, [toast]);

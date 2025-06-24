@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getNewsAction } from '@/app/actions';
 import type { GetNewsOutput } from '@/ai/flows/get-cricket-news';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -19,19 +18,24 @@ export default function NewsClient() {
     async function fetchNews() {
         setLoading(true);
         setError(null);
-        const result = await getNewsAction();
-
-        if (result.error) {
-            setError(result.error);
+        try {
+            const response = await fetch('/api/news');
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to fetch news');
+            }
+            const data = await response.json();
+            setNews(data);
+        } catch (err: any) {
+            setError(err.message);
             toast({
                 variant: 'destructive',
                 title: 'An error occurred',
-                description: result.error,
+                description: err.message,
             });
-        } else {
-            setNews(result.data);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     }
     fetchNews();
   }, [toast]);

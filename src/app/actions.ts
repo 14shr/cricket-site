@@ -2,9 +2,6 @@
 
 import { z } from 'zod';
 import { disambiguatePlayerStats, type DisambiguatePlayerStatsOutput } from '@/ai/flows/disambiguate-player-stats';
-import { getLiveMatches as fetchLiveMatches } from '@/lib/live-scraper';
-import { getLatestVideos } from '@/lib/youtube-scraper';
-import { getNews, type GetNewsOutput } from '@/ai/flows/get-cricket-news';
 
 const PlayerStatsActionSchema = z.object({
   playerName: z.string().min(2, { message: "Player name must be at least 2 characters." }),
@@ -32,61 +29,6 @@ export async function getPlayerStatsAction(input: { playerName: string }): Promi
     const errorMessage = e instanceof Error ? e.message : "An unexpected error occurred.";
     return {
       error: `Failed to retrieve player stats. ${errorMessage}`
-    };
-  }
-}
-
-type LiveMatchesActionState = {
-    data?: string[] | null;
-    error?: string | null;
-}
-
-export async function getLiveMatchesAction(): Promise<LiveMatchesActionState> {
-    try {
-        const matches = await fetchLiveMatches();
-        return { data: matches };
-    } catch (e) {
-        console.error(e);
-        const errorMessage = e instanceof Error ? e.message : "An unexpected error occurred.";
-        return {
-            error: `Failed to retrieve live matches. ${errorMessage}`
-        };
-    }
-}
-
-
-type LatestVideosActionState = {
-    data?: string[] | null;
-    error?: string | null;
-}
-
-export async function getLatestVideosAction(): Promise<LatestVideosActionState> {
-    try {
-        const videos = await getLatestVideos();
-        return { data: videos };
-    } catch (e) {
-        console.error(e);
-        const errorMessage = e instanceof Error ? e.message : "An unexpected error occurred.";
-        return {
-            error: `Failed to retrieve latest videos. ${errorMessage}`
-        };
-    }
-}
-
-type NewsActionState = {
-  data?: GetNewsOutput | null;
-  error?: string | null;
-}
-
-export async function getNewsAction(): Promise<NewsActionState> {
-  try {
-    const news = await getNews();
-    return { data: news };
-  } catch (e) {
-    console.error(e);
-    const errorMessage = e instanceof Error ? e.message : "An unexpected error occurred.";
-    return {
-      error: `Failed to retrieve news. ${errorMessage}`
     };
   }
 }
