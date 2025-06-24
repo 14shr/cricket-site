@@ -69,12 +69,16 @@ export default function CricketStatsClient() {
   return (
     <main className="flex-1">
       {/* Hero Section */}
-      <section className="w-full py-12 text-center md:py-20 lg:py-24 bg-background">
-        <div className="container mx-auto px-4 md:px-6">
-          <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+      <section 
+        className="w-full py-12 text-center md:py-20 lg:py-24 bg-cover bg-center relative"
+        style={{ backgroundImage: "url('https://i.ibb.co/L5k9X4r/image.png')" }}
+      >
+        <div className="absolute inset-0 bg-black bg-opacity-60"></div>
+        <div className="container relative mx-auto px-4 md:px-6">
+          <h1 className="text-3xl font-bold tracking-tighter text-white sm:text-4xl md:text-5xl">
             Welcome to CricStats Central
           </h1>
-          <p className="mx-auto max-w-[700px] mt-4 text-muted-foreground md:text-xl/relaxed">
+          <p className="mx-auto max-w-[700px] mt-4 text-gray-200 md:text-xl/relaxed">
             Your hub for the latest cricket news, scores, and stats.
           </p>
           <div className="mx-auto mt-6 w-full max-w-sm">
