@@ -58,14 +58,14 @@ const PlayerStatsSchema = z.object({
     }),
   }),
   batting_stats: z.object({
-    test: BattingStatsSchema.describe("Batting statistics for Test matches."),
-    odi: BattingStatsSchema.describe("Batting statistics for One Day International matches."),
-    t20i: BattingStatsSchema.describe("Batting statistics for T20 International matches."),
+    test: BattingStatsSchema,
+    odi: BattingStatsSchema,
+    t20i: BattingStatsSchema,
   }),
   bowling_stats: z.object({
-    test: BowlingStatsSchema.describe("Bowling statistics for Test matches."),
-    odi: BowlingStatsSchema.describe("Bowling statistics for One Day International matches."),
-    t20i: BowlingStatsSchema.describe("Bowling statistics for T20 International matches."),
+    test: BowlingStatsSchema,
+    odi: BowlingStatsSchema,
+    t20i: BowlingStatsSchema,
   }),
   summary: z.string().describe("A concise summary of the player's career, their role, and key achievements."),
 });
@@ -76,6 +76,33 @@ const DisambiguatePlayerStatsOutputSchema = z.object({
 });
 
 export type DisambiguatePlayerStatsOutput = z.infer<typeof DisambiguatePlayerStatsOutputSchema>;
+
+// --- TEMPORARY STATS FALLBACK ---
+
+function getTemporaryStats(playerInfo: { name: string; image: string | null; role: string }): z.infer<typeof PlayerStatsSchema> {
+    const na = 'N/A';
+    return {
+        name: playerInfo.name,
+        country: na,
+        image: playerInfo.image,
+        role: playerInfo.role,
+        rankings: {
+            batting: { test: na, odi: na, t20: na },
+            bowling: { test: na, odi: na, t20: na },
+        },
+        batting_stats: {
+            test: { matches: na, runs: na, highest_score: na, average: na, strike_rate: na, hundreds: na, fifties: na },
+            odi: { matches: na, runs: na, highest_score: na, average: na, strike_rate: na, hundreds: na, fifties: na },
+            t20i: { matches: na, runs: na, highest_score: na, average: na, strike_rate: na, hundreds: na, fifties: na },
+        },
+        bowling_stats: {
+            test: { matches: na, balls: na, runs: na, wickets: na, best_bowling_innings: na, economy: na, five_wickets: na },
+            odi: { matches: na, balls: na, runs: na, wickets: na, best_bowling_innings: na, economy: na, five_wickets: na },
+            t20i: { matches: na, balls: na, runs: na, wickets: na, best_bowling_innings: na, economy: na, five_wickets: na },
+        },
+        summary: 'Could not fetch live AI-powered stats at the moment. Displaying available basic information.',
+    };
+}
 
 // --- EXPORTED ACTION FUNCTION ---
 
@@ -125,12 +152,22 @@ const disambiguatePlayerStatsFlow = ai.defineFlow(
       }
 
       // Step 2: Use the player's name from the CSV to get detailed stats from the AI.
-      const { output: generatedStats } = await getPlayerStatsPrompt({ playerName: csvPlayerData.name });
+      let generatedStats;
+      try {
+        const result = await getPlayerStatsPrompt({ playerName: csvPlayerData.name });
+        generatedStats = result.output;
+      } catch (e) {
+          console.error("Error fetching stats from AI:", e);
+          generatedStats = null;
+      }
       
       if (!generatedStats) {
-          return {
-              summary: `While player "${csvPlayerData.name}" was found, we couldn't retrieve detailed stats at the moment.`,
-          }
+        // AI failed or returned no stats, use temporary data as a fallback.
+        const temporaryStats = getTemporaryStats(csvPlayerData);
+        return {
+            playerStats: temporaryStats,
+            summary: temporaryStats.summary,
+        }
       }
 
       // Step 3: Combine the reliable data from the CSV (name, image, role) with the generated stats.
