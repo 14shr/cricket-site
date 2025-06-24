@@ -28,7 +28,7 @@ export async function getRecentMatches(): Promise<RecentMatch[]> {
   const apiKey = process.env.RAPIDAPI_KEY;
   if (!apiKey) {
     console.error('RAPIDAPI_KEY is not set in the environment.');
-    throw new Error('RapidAPI key is not configured.');
+    throw new Error('The API key for the news service is not configured. Please add RAPIDAPI_KEY to your environment variables.');
   }
 
   const options = {
@@ -56,7 +56,7 @@ export async function getRecentMatches(): Promise<RecentMatch[]> {
       }
 
       for (const seriesMatch of typeMatch.seriesMatches) {
-        // The actual matches are nested inside seriesAdWrapper
+        // The actual matches are nested inside seriesAdWrapper, but some elements are ads
         if (!seriesMatch || !seriesMatch.seriesAdWrapper || !Array.isArray(seriesMatch.seriesAdWrapper.matches)) {
           continue;
         }
@@ -91,11 +91,24 @@ export async function getRecentMatches(): Promise<RecentMatch[]> {
       }
     }
     
-    // Return a limited number of matches to keep the AI processing focused.
     return processedMatches.slice(0, 10);
   } catch (error) {
     console.error('Error fetching from Cricbuzz API:', error);
-    return [];
+    if (axios.isAxiosError(error)) {
+        if (error.response) {
+            const status = error.response.status;
+            let message = `The news service responded with an error (status ${status}).`;
+            if (status === 401 || status === 403) {
+                message = "Authentication with the news service failed. Please check your RAPIDAPI_KEY."
+            } else if (status >= 500) {
+                message = "The news service is temporarily unavailable. Please try again later."
+            }
+            throw new Error(message);
+        } else if (error.request) {
+            throw new Error("Could not connect to the news service. Please check your network connection.");
+        }
+    }
+    throw new Error("An unexpected error occurred while fetching news.");
   }
 }
 
