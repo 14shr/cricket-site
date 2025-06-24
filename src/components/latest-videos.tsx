@@ -1,5 +1,4 @@
-import { PlaySquare } from "lucide-react";
-import { Card, CardContent } from "./ui/card";
+import { Card } from "./ui/card";
 import { Skeleton } from "./ui/skeleton";
 
 type LatestVideosProps = {
@@ -14,13 +13,19 @@ export function LatestVideos({ videos }: LatestVideosProps) {
     }
 
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {videos.map((_videoUrl, index) => (
-                 <Card key={index}>
-                    <CardContent className="p-4 flex items-center gap-4">
-                        <PlaySquare className="h-5 w-5 text-muted-foreground" />
-                        <p className="font-medium">Match Highlight {index + 1}</p>
-                    </CardContent>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {videos.map((videoUrl, index) => (
+                <Card key={index} className="overflow-hidden shadow-lg">
+                    <div className="aspect-video">
+                        <iframe
+                            className="w-full h-full"
+                            src={videoUrl}
+                            title={`YouTube video player ${index + 1}`}
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowFullScreen
+                        ></iframe>
+                    </div>
                 </Card>
             ))}
         </div>
@@ -29,10 +34,10 @@ export function LatestVideos({ videos }: LatestVideosProps) {
 
 export function LatestVideosSkeleton() {
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            <Skeleton className="h-16 w-full bg-background/80 rounded-lg" />
-            <Skeleton className="h-16 w-full bg-background/80 rounded-lg" />
-            <Skeleton className="h-16 w-full bg-background/80 rounded-lg" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <Skeleton className="w-full aspect-video bg-muted rounded-lg" />
+            <Skeleton className="w-full aspect-video bg-muted rounded-lg" />
+            <Skeleton className="w-full aspect-video bg-muted rounded-lg" />
         </div>
     )
 }
