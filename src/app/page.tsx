@@ -1,4 +1,4 @@
-import FootballStatsClient from './cric-stats-client';
+import CricketStatsClient from './cric-stats-client';
 
 export default function Home() {
   return (
@@ -12,7 +12,7 @@ export default function Home() {
             Enter a player's name to get their career statistics, powered by AI.
           </p>
         </header>
-        <FootballStatsClient />
+        <CricketStatsClient />
       </div>
     </main>
   );
