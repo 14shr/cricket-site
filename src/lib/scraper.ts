@@ -33,7 +33,7 @@ export async function scrapePlayerStats(playerName: string): Promise<ScrapedData
     let profileLink: string | null = null;
     
     try {
-        const results = await search.search({ query, limit: 5 });
+        const results = await search.search(query);
         const cricbuzzResult = results.find((r: any) => r.link && r.link.includes("cricbuzz.com/profiles/"));
         if (cricbuzzResult) {
             profileLink = cricbuzzResult.link;
