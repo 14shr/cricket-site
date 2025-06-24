@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import { NewsArticleCard, NewsArticleSkeleton } from '@/components/news-article-card';
+import { MotionWrapper } from '@/components/motion-wrapper';
 
 export default function NewsClient() {
   const [news, setNews] = useState<GetNewsOutput | null>(null);
@@ -55,12 +56,16 @@ export default function NewsClient() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {news.articles.length > 0 ? (
                     news.articles.map((article, index) => (
-                        <NewsArticleCard key={index} article={article} />
+                        <MotionWrapper key={index} delay={index * 0.1}>
+                           <NewsArticleCard article={article} />
+                        </MotionWrapper>
                     ))
                 ) : (
-                    <div className="col-span-full text-center text-muted-foreground">
-                        <p>{news.summary}</p>
-                    </div>
+                    <MotionWrapper className="col-span-full">
+                      <div className="text-center text-muted-foreground">
+                          <p>{news.summary}</p>
+                      </div>
+                    </MotionWrapper>
                 )}
             </div>
         )}

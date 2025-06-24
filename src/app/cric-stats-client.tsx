@@ -12,6 +12,7 @@ import { AlertCircle } from 'lucide-react';
 import { LatestVideos, LatestVideosSkeleton } from '@/components/latest-videos';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
+import { MotionWrapper } from '@/components/motion-wrapper';
 
 export default function CricketStatsClient() {
   const [loading, setLoading] = useState(false);
@@ -95,11 +96,13 @@ export default function CricketStatsClient() {
           {loading && <LoadingSkeleton />}
 
           {error && !loading && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Error</AlertTitle>
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
+            <MotionWrapper>
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            </MotionWrapper>
           )}
           
           {data && !loading && <PlayerStatsTable data={data} />}
@@ -107,43 +110,51 @@ export default function CricketStatsClient() {
         
         {/* Show feature cards */}
         <div className="grid gap-6 md:grid-cols-3">
-            <Link href="/scores" className="block hover:scale-105 transition-transform duration-200">
-                <Card className="h-full">
-                    <CardHeader>
-                        <CardTitle>Live Scores</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-sm text-muted-foreground">Stay updated with real-time match scores and updates.</p>
-                    </CardContent>
-                </Card>
-            </Link>
-            <Link href="/stadium" className="block hover:scale-105 transition-transform duration-200">
-                <Card className="h-full">
-                    <CardHeader>
-                        <CardTitle>Stadium View</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-sm text-muted-foreground">Explore cricket stadiums in stunning 3D.</p>
-                    </CardContent>
-                </Card>
-            </Link>
-            <Link href="/news" className="block hover:scale-105 transition-transform duration-200">
-                <Card className="h-full">
-                    <CardHeader>
-                        <CardTitle>Cricket News</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-sm text-muted-foreground">Catch up on the latest headlines from the cricket world.</p>
-                    </CardContent>
-                </Card>
-            </Link>
+            <MotionWrapper delay={0.1}>
+              <Link href="/scores" className="block hover:scale-105 transition-transform duration-200">
+                  <Card className="h-full">
+                      <CardHeader>
+                          <CardTitle>Live Scores</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                          <p className="text-sm text-muted-foreground">Stay updated with real-time match scores and updates.</p>
+                      </CardContent>
+                  </Card>
+              </Link>
+            </MotionWrapper>
+            <MotionWrapper delay={0.2}>
+              <Link href="/stadium" className="block hover:scale-105 transition-transform duration-200">
+                  <Card className="h-full">
+                      <CardHeader>
+                          <CardTitle>Stadium View</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                          <p className="text-sm text-muted-foreground">Explore cricket stadiums in stunning 3D.</p>
+                      </CardContent>
+                  </Card>
+              </Link>
+            </MotionWrapper>
+            <MotionWrapper delay={0.3}>
+              <Link href="/news" className="block hover:scale-105 transition-transform duration-200">
+                  <Card className="h-full">
+                      <CardHeader>
+                          <CardTitle>Cricket News</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                          <p className="text-sm text-muted-foreground">Catch up on the latest headlines from the cricket world.</p>
+                      </CardContent>
+                  </Card>
+              </Link>
+            </MotionWrapper>
         </div>
       </div>
 
       {/* Highlights Section */}
       <section className="w-full py-12 md:py-20 bg-muted">
           <div className="container mx-auto px-4 md:px-6">
-              <h2 className="mb-8 text-3xl font-bold tracking-tighter text-center">Latest Highlights</h2>
+              <MotionWrapper>
+                <h2 className="mb-8 text-3xl font-bold tracking-tighter text-center">Latest Highlights</h2>
+              </MotionWrapper>
               {videosLoading ? <LatestVideosSkeleton /> : latestVideos && <LatestVideos videos={latestVideos} />}
           </div>
       </section>

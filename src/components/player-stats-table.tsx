@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "./ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { Separator } from "./ui/separator";
+import { MotionWrapper } from "./motion-wrapper";
 
 type PlayerStatsTableProps = {
   data: DisambiguatePlayerStatsOutput;
@@ -89,21 +90,23 @@ const StatsTable = ({ title, stats }: { title: string, stats: Record<string, any
 export function PlayerStatsTable({ data }: PlayerStatsTableProps) {
   if (!data || !data.playerStats) {
     return (
-       <Card className="shadow-lg text-center bg-card">
-        <CardHeader>
-          <CardTitle className="font-headline text-2xl">No Results</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p>{data?.summary || 'No player statistics found for your query.'}</p>
-        </CardContent>
-       </Card>
+       <MotionWrapper>
+        <Card className="shadow-lg text-center bg-card">
+          <CardHeader>
+            <CardTitle className="font-headline text-2xl">No Results</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p>{data?.summary || 'No player statistics found for your query.'}</p>
+          </CardContent>
+        </Card>
+       </MotionWrapper>
     )
   }
   
   const { playerStats } = data;
 
   return (
-    <div className="space-y-6">
+    <MotionWrapper className="space-y-6">
       <Card className="shadow-lg bg-card overflow-hidden">
         <div className="flex flex-col md:flex-row">
           <div className="md:w-1/3 xl:w-1/4">
@@ -135,6 +138,6 @@ export function PlayerStatsTable({ data }: PlayerStatsTableProps) {
       {playerStats.batting_stats && Object.keys(playerStats.batting_stats).length > 0 && <StatsTable title="Batting Career" stats={playerStats.batting_stats} />}
       {playerStats.bowling_stats && Object.keys(playerStats.bowling_stats).length > 0 && <StatsTable title="Bowling Career" stats={playerStats.bowling_stats} />}
 
-    </div>
+    </MotionWrapper>
   );
 }
