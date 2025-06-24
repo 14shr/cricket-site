@@ -83,10 +83,10 @@ export default function CricketStatsClient() {
 
   return (
     <div className="space-y-8">
-      {liveMatchesLoading ? renderLiveMatchesLoader() : liveMatches && <LiveMatches matches={liveMatches} />}
-      
       <SearchForm onSubmit={handleSearch} isPending={loading} />
       
+      {liveMatchesLoading ? renderLiveMatchesLoader() : liveMatches && <LiveMatches matches={liveMatches} />}
+
       {loading && <LoadingSkeleton />}
 
       {error && !loading && (

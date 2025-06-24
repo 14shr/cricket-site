@@ -28,13 +28,15 @@ export function LiveMatches({ matches }: LiveMatchesProps) {
         <CardDescription>Live scores from across the globe.</CardDescription>
       </CardHeader>
       <CardContent>
-        <ul className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {matches.map((match, index) => (
-            <li key={index} className="p-3 bg-muted/50 rounded-md border border-border/50">
-              <p className="text-sm font-medium text-foreground/90 whitespace-pre-wrap">{match}</p>
-            </li>
+             <Card key={index} className="bg-muted/80">
+                <CardContent className="p-4 flex items-center justify-center h-full">
+                     <p className="text-sm font-medium text-center text-foreground/90 whitespace-pre-wrap">{match}</p>
+                </CardContent>
+            </Card>
           ))}
-        </ul>
+        </div>
       </CardContent>
     </Card>
   );
