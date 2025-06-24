@@ -18,7 +18,6 @@ const NewsArticleSchema = z.object({
     summary: z.string().describe("A brief summary of the match, including the result and key details."),
     source: z.string().describe("The name of the news source (e.g., Cricbuzz)."),
     url: z.string().describe("A direct URL to a relevant cricket website."),
-    image: z.string().describe("A URL for a relevant image for the article. Use a placeholder if no real image is available."),
 });
 
 const GetNewsOutputSchema = z.object({
@@ -55,7 +54,6 @@ const getNewsFlow = ai.defineFlow(
           summary: `The ${match.matchDescription} of the ${match.seriesName} between ${match.team1Name} and ${match.team2Name} took place at ${match.venue}.`,
           source: "Cricbuzz",
           url: "https://www.cricbuzz.com/",
-          image: 'https://placehold.co/600x400.png',
         };
       });
 

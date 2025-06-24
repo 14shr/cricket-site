@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import type { GetNewsOutput } from '@/ai/flows/get-cricket-news';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
@@ -15,15 +14,6 @@ type NewsArticleCardProps = {
 export function NewsArticleCard({ article }: NewsArticleCardProps) {
   return (
     <Card className="flex flex-col h-full overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
-      <div className="relative w-full aspect-video">
-        <Image
-          src={article.image || 'https://placehold.co/600x400.png'}
-          alt={article.headline}
-          data-ai-hint="cricket news"
-          fill
-          className="object-cover"
-        />
-      </div>
       <CardHeader>
         <CardTitle className="text-lg font-bold leading-snug">{article.headline}</CardTitle>
         <CardDescription className="text-xs pt-1">Source: {article.source}</CardDescription>
@@ -45,7 +35,6 @@ export function NewsArticleCard({ article }: NewsArticleCardProps) {
 export function NewsArticleSkeleton() {
     return (
         <Card className="flex flex-col h-full overflow-hidden">
-            <Skeleton className="w-full aspect-video" />
             <CardHeader>
                 <Skeleton className="h-6 w-5/6" />
                 <Skeleton className="h-4 w-1/4 mt-2" />
