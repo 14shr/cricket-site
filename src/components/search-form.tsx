@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Search } from 'lucide-react';
 
 const formSchema = z.object({
@@ -34,6 +34,7 @@ export function SearchForm({ onSubmit, isPending }: SearchFormProps) {
     <Card className="shadow-lg bg-card">
       <CardHeader>
         <CardTitle className="font-headline text-2xl">Player Search</CardTitle>
+        <CardDescription>Enter a player's name to get their career statistics, powered by AI.</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
