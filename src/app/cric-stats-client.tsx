@@ -117,14 +117,16 @@ export default function CricketStatsClient() {
                     </CardContent>
                 </Card>
             </Link>
-            <Card className="h-full">
-                <CardHeader>
-                    <CardTitle>Player Stats</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <p className="text-sm text-muted-foreground">Access detailed stats and profiles of your favorite players.</p>
-                </CardContent>
-            </Card>
+            <Link href="/stadium" className="block hover:scale-105 transition-transform duration-200">
+                <Card className="h-full">
+                    <CardHeader>
+                        <CardTitle>Stadium View</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-sm text-muted-foreground">Explore cricket stadiums in stunning 3D.</p>
+                    </CardContent>
+                </Card>
+            </Link>
             <Card className="h-full">
                 <CardHeader>
                     <CardTitle>Match Calendar</CardTitle>
