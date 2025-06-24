@@ -10,7 +10,6 @@ import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import { LiveMatches } from '@/components/live-matches';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function CricketStatsClient() {
@@ -67,18 +66,16 @@ export default function CricketStatsClient() {
   };
   
   const renderLiveMatchesLoader = () => (
-    <Card className="shadow-lg bg-card">
-      <CardHeader>
+    <div className="w-full">
+      <div className="mb-4">
         <Skeleton className="h-8 w-48 bg-muted/80" />
         <Skeleton className="h-4 w-64 mt-2 bg-muted/80" />
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <Skeleton className="h-12 w-full bg-muted/80" />
-          <Skeleton className="h-12 w-full bg-muted/80" />
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Skeleton className="h-20 w-full bg-muted/80 rounded-lg" />
+        <Skeleton className="h-20 w-full bg-muted/80 rounded-lg" />
+      </div>
+    </div>
   );
 
   return (
