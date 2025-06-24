@@ -30,7 +30,7 @@ export function NavigationHeader() {
           >
             <Link href="/scores">Scores</Link>
           </Button>
-          <Button asChild variant="ghost" className="rounded-full h-8 px-3 text-xs sm:px-4 sm:text-sm text-muted-foreground" disabled>
+          <Button asChild variant="ghost" className="rounded-full h-8 px-3 text-xs sm:px-4 sm:text-sm text-secondary-foreground" disabled>
             <Link href="#">News</Link>
           </Button>
         </nav>
