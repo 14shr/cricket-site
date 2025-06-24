@@ -9,25 +9,34 @@ type PlayerStatsTableProps = {
   data: DisambiguatePlayerStatsOutput;
 };
 
-const StatCard = ({ title, test, odi, t20 }: { title: string; test: string; odi: string; t20: string }) => (
-  <div className="flex flex-col items-center justify-center p-3 rounded-lg bg-muted">
-    <span className="text-xs font-medium text-muted-foreground">{title}</span>
-    <div className="flex gap-4 mt-1">
-      <div className="text-center">
-        <p className="text-xs text-muted-foreground/80">Test</p>
-        <p className="font-bold text-sm text-primary">{test}</p>
-      </div>
-      <div className="text-center">
-        <p className="text-xs text-muted-foreground/80">ODI</p>
-        <p className="font-bold text-sm text-primary">{odi}</p>
-      </div>
-      <div className="text-center">
-        <p className="text-xs text-muted-foreground/80">T20</p>
-        <p className="font-bold text-sm text-primary">{t20}</p>
+const RankingDisplay = ({ batting, bowling }: { batting: { test: string; odi: string; t20: string }; bowling: { test: string; odi: string; t20: string } }) => {
+  const RankingColumn = ({ title, stats }: { title: string; stats: { test: string; odi: string; t20: string }}) => (
+    <div>
+      <h4 className="text-base font-medium text-foreground mb-2">{title}</h4>
+      <div className="grid grid-cols-3 text-center">
+        <div>
+          <p className="text-xs text-muted-foreground">Test</p>
+          <p className="font-bold text-lg text-primary">{stats.test}</p>
+        </div>
+        <div>
+          <p className="text-xs text-muted-foreground">ODI</p>
+          <p className="font-bold text-lg text-primary">{stats.odi}</p>
+        </div>
+        <div>
+          <p className="text-xs text-muted-foreground">T20</p>
+          <p className="font-bold text-lg text-primary">{stats.t20}</p>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8">
+      <RankingColumn title="Batting" stats={batting} />
+      <RankingColumn title="Bowling" stats={bowling} />
+    </div>
+  );
+};
 
 const StatsTable = ({ title, stats }: { title: string, stats: Record<string, any> }) => {
   const formats = ['test', 'odi', 't20i'];
@@ -112,10 +121,7 @@ export function PlayerStatsTable({ data }: PlayerStatsTableProps) {
             <Separator />
             <div>
               <h3 className="text-lg font-semibold font-headline mb-3">ICC Rankings</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <StatCard title="Batting" {...playerStats.rankings.batting} />
-                <StatCard title="Bowling" {...playerStats.rankings.bowling} />
-              </div>
+              <RankingDisplay batting={playerStats.rankings.batting} bowling={playerStats.rankings.bowling} />
             </div>
              <Separator />
              <div>
