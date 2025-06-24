@@ -34,11 +34,21 @@ export default function ScoresClient() {
     fetchLiveScores();
   }, [toast]);
 
+  const isLive = matches && matches.length > 0 && !matches[0].toLowerCase().includes('no live') && !matches[0].toLowerCase().includes('could not');
+
   return (
     <div className="container mx-auto px-4 md:px-6 py-12">
       <div className="flex items-center gap-4 mb-8">
         <Tv className="h-8 w-8 text-primary" />
-        <h1 className="text-3xl font-bold tracking-tighter font-headline sm:text-4xl md:text-5xl">Live Cricket Scores</h1>
+        <h1 className="text-3xl font-bold tracking-tighter font-headline sm:text-4xl md:text-5xl flex items-center gap-3">
+          <span>Live Cricket Scores</span>
+          {!loading && isLive && (
+            <div className="relative flex h-3 w-3">
+                <div className="animate-ping absolute inline-flex h-full w-full rounded-full bg-chart-2 opacity-75" />
+                <div className="relative inline-flex rounded-full h-3 w-3 bg-chart-2" />
+            </div>
+          )}
+        </h1>
       </div>
 
       {loading && (

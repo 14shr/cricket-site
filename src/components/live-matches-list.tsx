@@ -23,9 +23,9 @@ export function LiveMatchesList({ matches }: LiveMatchesListProps) {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {matches.map((match, index) => (
-                <Card key={index} className="bg-muted/50 hover:bg-muted transition-colors flex">
+                <Card key={index} className="bg-primary text-primary-foreground shadow-lg flex">
                     <CardContent className="p-6 flex items-center justify-center h-full w-full">
-                        <p className="text-sm font-medium text-center text-foreground/90 whitespace-pre-wrap">{match}</p>
+                        <p className="font-code text-base text-center whitespace-pre-wrap">{match}</p>
                     </CardContent>
                 </Card>
             ))}
