@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { disambiguatePlayerStats, type DisambiguatePlayerStatsOutput } from '@/ai/flows/disambiguate-player-stats';
 import { getLiveMatches as fetchLiveMatches } from '@/lib/live-scraper';
 import { getLatestVideos } from '@/lib/youtube-scraper';
-import { getMatchSchedule, type GetMatchScheduleOutput } from '@/ai/flows/get-match-schedule';
+import { getNews, type GetNewsOutput } from '@/ai/flows/get-cricket-news';
 
 const PlayerStatsActionSchema = z.object({
   playerName: z.string().min(2, { message: "Player name must be at least 2 characters." }),
@@ -73,32 +73,20 @@ export async function getLatestVideosAction(): Promise<LatestVideosActionState> 
     }
 }
 
-const MatchScheduleActionSchema = z.object({
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, { message: "Invalid date format. Please use YYYY-MM-DD." }),
-});
-
-type MatchScheduleActionState = {
-  data?: GetMatchScheduleOutput | null;
+type NewsActionState = {
+  data?: GetNewsOutput | null;
   error?: string | null;
 }
 
-export async function getMatchScheduleAction(input: { date: string }): Promise<MatchScheduleActionState> {
-  const validationResult = MatchScheduleActionSchema.safeParse(input);
-
-  if (!validationResult.success) {
-    return {
-      error: validationResult.error.errors.map((e) => e.message).join(', '),
-    };
-  }
-
+export async function getNewsAction(): Promise<NewsActionState> {
   try {
-    const schedule = await getMatchSchedule({ date: validationResult.data.date });
-    return { data: schedule };
+    const news = await getNews();
+    return { data: news };
   } catch (e) {
     console.error(e);
     const errorMessage = e instanceof Error ? e.message : "An unexpected error occurred.";
     return {
-      error: `Failed to retrieve match schedule. ${errorMessage}`
+      error: `Failed to retrieve news. ${errorMessage}`
     };
   }
 }

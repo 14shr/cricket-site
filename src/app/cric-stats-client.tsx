@@ -127,13 +127,13 @@ export default function CricketStatsClient() {
                     </CardContent>
                 </Card>
             </Link>
-            <Link href="/calendar" className="block hover:scale-105 transition-transform duration-200">
+            <Link href="/news" className="block hover:scale-105 transition-transform duration-200">
                 <Card className="h-full">
                     <CardHeader>
-                        <CardTitle>Match Calendar</CardTitle>
+                        <CardTitle>Cricket News</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-sm text-muted-foreground">View upcoming fixtures and previous results.</p>
+                        <p className="text-sm text-muted-foreground">Catch up on the latest headlines from the cricket world.</p>
                     </CardContent>
                 </Card>
             </Link>

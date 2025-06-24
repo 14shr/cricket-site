@@ -39,10 +39,10 @@ export function NavigationHeader() {
           </Button>
           <Button
             asChild
-            variant={pathname === '/calendar' ? 'secondary' : 'ghost'}
+            variant={pathname === '/news' ? 'secondary' : 'ghost'}
             className="rounded-full h-8 px-3 text-xs sm:px-4 sm:text-sm text-secondary-foreground"
           >
-            <Link href="/calendar">Calendar</Link>
+            <Link href="/news">News</Link>
           </Button>
         </nav>
       </div>
