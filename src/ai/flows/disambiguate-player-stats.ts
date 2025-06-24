@@ -1,9 +1,10 @@
 'use server';
 
 /**
- * @fileOverview This file defines a flow to get cricket player stats from a local CSV file.
+ * @fileOverview This file defines a flow to get cricket player stats.
+ * It first looks up a player in a local CSV file for basic info,
+ * then uses an AI model to fetch detailed statistics.
  *
- * It takes a player name as input and returns detailed player statistics.
  * @param {DisambiguatePlayerStatsInput} input - The input data containing the player name.
  * @returns {Promise<DisambiguatePlayerStatsOutput>} - A promise that resolves to the player statistics.
  */
@@ -11,6 +12,8 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'zod';
 import { getPlayerFromCSV } from '@/lib/csv-parser';
+
+// --- INPUT/OUTPUT SCHEMAS ---
 
 const DisambiguatePlayerStatsInputSchema = z.object({
   playerName: z.string().describe('The name of the player to search for.'),
@@ -56,7 +59,7 @@ const PlayerStatsSchema = z.object({
   }),
   batting_stats: z.record(z.string(), BattingStatsSchema),
   bowling_stats: z.record(z.string(), BowlingStatsSchema),
-  summary: z.string(),
+  summary: z.string().describe("A concise summary of the player's career, their role, and key achievements."),
 });
 
 const DisambiguatePlayerStatsOutputSchema = z.object({
@@ -66,9 +69,35 @@ const DisambiguatePlayerStatsOutputSchema = z.object({
 
 export type DisambiguatePlayerStatsOutput = z.infer<typeof DisambiguatePlayerStatsOutputSchema>;
 
+// --- EXPORTED ACTION FUNCTION ---
+
 export async function disambiguatePlayerStats(input: DisambiguatePlayerStatsInput): Promise<DisambiguatePlayerStatsOutput> {
   return disambiguatePlayerStatsFlow(input);
 }
+
+// --- GENKIT PROMPT ---
+
+const getPlayerStatsPrompt = ai.definePrompt({
+  name: 'getPlayerStatsPrompt',
+  input: { schema: z.object({ playerName: z.string() }) },
+  output: { schema: PlayerStatsSchema },
+  prompt: `You are a cricket statistics expert. Your task is to provide detailed statistics for the player named {{{playerName}}}.
+
+  Your response MUST be in the specified JSON format.
+  
+  Please provide comprehensive statistics for Test, ODI, and T20I formats. If a specific statistic is not available for a format, represent it with a hyphen "-".
+  
+  The output should include:
+  - Player's country.
+  - Current ICC rankings for batting and bowling across all formats.
+  - Detailed batting stats (Matches, Runs, Highest Score, Average, Strike Rate, 100s, 50s) for Test, ODI, and T20I.
+  - Detailed bowling stats (Matches, Balls, Runs, Wickets, BBI, Economy, 5 Wickets) for Test, ODI, and T20I.
+  - A concise professional summary of the player's career, their role in the team, and their most significant achievements.
+  
+  Do not include the player's name, image, or role in your direct output, as those are handled separately.`,
+});
+
+// --- GENKIT FLOW ---
 
 const disambiguatePlayerStatsFlow = ai.defineFlow(
   {
@@ -78,22 +107,43 @@ const disambiguatePlayerStatsFlow = ai.defineFlow(
   },
   async (input) => {
     try {
-      const playerData = await getPlayerFromCSV(input.playerName);
+      // Step 1: Find the player in the local CSV file.
+      const csvPlayerData = await getPlayerFromCSV(input.playerName);
       
-      if (!playerData) {
+      if (!csvPlayerData) {
         return {
-          summary: `Could not find player "${input.playerName}" in the data file.`,
-        }
+          summary: `Could not find player "${input.playerName}" in the data file. Please check the spelling or try a different name.`,
+        };
       }
 
-      return {
-        playerStats: playerData,
-        summary: playerData.summary,
+      // Step 2: Use the player's name from the CSV to get detailed stats from the AI.
+      const { output: generatedStats } = await getPlayerStatsPrompt({ playerName: csvPlayerData.name });
+      
+      if (!generatedStats) {
+          return {
+              summary: `While player "${csvPlayerData.name}" was found, we couldn't retrieve detailed stats at the moment.`,
+          }
+      }
+
+      // Step 3: Combine the reliable data from the CSV (name, image, role) with the generated stats.
+      const finalPlayerStats: z.infer<typeof PlayerStatsSchema> = {
+          ...generatedStats,
+          name: csvPlayerData.name,
+          image: csvPlayerData.image,
+          role: csvPlayerData.role,
+          // The summary from the AI is usually more descriptive.
+          summary: generatedStats.summary, 
       };
+
+      return {
+        playerStats: finalPlayerStats,
+        summary: `Displaying comprehensive stats for ${finalPlayerStats.name}.`,
+      };
+
     } catch(e: any) {
-        console.error(e);
+        console.error("Error in disambiguatePlayerStatsFlow:", e);
         return {
-            summary: e.message || "An unexpected error occurred while fetching player stats from the CSV."
+            summary: e.message || "An unexpected error occurred while fetching player stats."
         }
     }
   }
