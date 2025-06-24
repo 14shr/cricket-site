@@ -12,21 +12,17 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 
 export default function CalendarClient() {
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [date, setDate] = useState<Date | undefined>();
   const [schedule, setSchedule] = useState<GetMatchScheduleOutput | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  useEffect(() => {
-    if (date) {
-        handleDateSelect(date);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Run once on initial load with today's date
-
   const handleDateSelect = async (selectedDate: Date | undefined) => {
-    if (!selectedDate) return;
+    if (!selectedDate) {
+      setLoading(false);
+      return;
+    }
 
     setDate(selectedDate);
     setLoading(true);
@@ -48,6 +44,13 @@ export default function CalendarClient() {
     }
     setLoading(false);
   };
+  
+  useEffect(() => {
+    // This effect runs only on the client-side after hydration.
+    // It sets the initial date to today and fetches the schedule.
+    handleDateSelect(new Date());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array ensures this runs only once on mount.
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -58,6 +61,7 @@ export default function CalendarClient() {
                     selected={date}
                     onSelect={handleDateSelect}
                     className="rounded-md"
+                    disabled={loading}
                 />
             </Card>
         </div>
