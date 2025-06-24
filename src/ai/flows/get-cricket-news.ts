@@ -7,11 +7,10 @@
  * - GetNewsOutput - The return type for the getNews function.
  */
 
-import {ai} from '@/ai/genkit';
 import {z} from 'zod';
 import { getRecentMatches } from '@/lib/news-tool';
 
-// --- OUTPUT SCHEMA (Remains the same to fit the UI) ---
+// --- OUTPUT SCHEMA ---
 
 const NewsArticleSchema = z.object({
     headline: z.string().describe("A headline summarizing the match result."),
@@ -30,44 +29,32 @@ export type GetNewsOutput = z.infer<typeof GetNewsOutputSchema>;
 // --- EXPORTED ACTION FUNCTION ---
 
 export async function getNews(): Promise<GetNewsOutput> {
-  return getNewsFlow();
-}
-
-// --- GENKIT FLOW ---
-
-const getNewsFlow = ai.defineFlow(
-  {
-    name: 'getNewsFlow',
-    outputSchema: GetNewsOutputSchema,
-  },
-  async () => {
-    try {
-      const matches = await getRecentMatches();
-      
-      if (!matches || matches.length === 0) {
-        return { articles: [], summary: "Could not find any recent cricket matches." };
-      }
-
-      const articles = matches.map(match => {
-        return {
-          headline: match.status,
-          summary: `The ${match.matchDescription} of the ${match.seriesName} between ${match.team1Name} and ${match.team2Name} took place at ${match.venue}.`,
-          source: "Cricbuzz",
-          url: "https://www.cricbuzz.com/",
-        };
-      });
-
-      return {
-        articles,
-        summary: "Displaying latest match results."
-      };
-
-    } catch(e: any) {
-        console.error("Error in getNewsFlow:", e);
-        return {
-            articles: [],
-            summary: e.message || "An unexpected error occurred while fetching the news."
-        }
+  try {
+    const matches = await getRecentMatches();
+    
+    if (!matches || matches.length === 0) {
+      return { articles: [], summary: "Could not find any recent cricket matches." };
     }
+
+    const articles = matches.map(match => {
+      return {
+        headline: match.status,
+        summary: `The ${match.matchDescription} of the ${match.seriesName} between ${match.team1Name} and ${match.team2Name} took place at ${match.venue}.`,
+        source: "Cricbuzz",
+        url: "https://www.cricbuzz.com/", // Default URL as the API doesn't provide one per match
+      };
+    });
+
+    return {
+      articles,
+      summary: "Displaying latest match results."
+    };
+
+  } catch(e: any) {
+      console.error("Error in getNews:", e);
+      return {
+          articles: [],
+          summary: e.message || "An unexpected error occurred while fetching the news."
+      }
   }
-);
+}

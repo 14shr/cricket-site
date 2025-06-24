@@ -65,7 +65,10 @@ function mapRowToPlayerStats(row: Record<string, string>): PlayerStats {
 
 export async function getPlayerFromCSV(playerName: string): Promise<PlayerStats | null> {
   try {
-    const filePath = path.join(process.cwd(), 'src', 'data', 'player-data.csv');
+    // Using a path relative to the current file (__dirname) is more robust for bundlers like Next.js
+    // as it helps with file tracing for serverless function packaging. The path navigates from the compiled
+    // output directory back to the source data file.
+    const filePath = path.join(__dirname, '../data/player-data.csv');
     const fileContent = await fs.readFile(filePath, 'utf-8');
     const players = parseCSV(fileContent);
 
