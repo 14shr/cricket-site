@@ -57,8 +57,16 @@ const PlayerStatsSchema = z.object({
       t20: z.string(),
     }),
   }),
-  batting_stats: z.record(z.string(), BattingStatsSchema),
-  bowling_stats: z.record(z.string(), BowlingStatsSchema),
+  batting_stats: z.object({
+    test: BattingStatsSchema.describe("Batting statistics for Test matches."),
+    odi: BattingStatsSchema.describe("Batting statistics for One Day International matches."),
+    t20i: BattingStatsSchema.describe("Batting statistics for T20 International matches."),
+  }),
+  bowling_stats: z.object({
+    test: BowlingStatsSchema.describe("Bowling statistics for Test matches."),
+    odi: BowlingStatsSchema.describe("Bowling statistics for One Day International matches."),
+    t20i: BowlingStatsSchema.describe("Bowling statistics for T20 International matches."),
+  }),
   summary: z.string().describe("A concise summary of the player's career, their role, and key achievements."),
 });
 
@@ -85,7 +93,7 @@ const getPlayerStatsPrompt = ai.definePrompt({
 
   Your response MUST be in the specified JSON format.
   
-  Please provide comprehensive statistics for Test, ODI, and T20I formats. If a specific statistic is not available for a format, represent it with a hyphen "-".
+  Please provide comprehensive statistics for Test, ODI, and T20I formats. The keys for these formats in the JSON output must be "test", "odi", and "t20i" respectively. If a specific statistic is not available for a format, represent it with a hyphen "-".
   
   The output should include:
   - Player's country.
