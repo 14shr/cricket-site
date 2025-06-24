@@ -43,43 +43,52 @@ export async function getRecentMatches(): Promise<RecentMatch[]> {
   try {
     const response = await axios.request(options);
     const rawData = response.data;
-    
     const processedMatches: RecentMatch[] = [];
-    
-    if (rawData.typeMatches) {
-        rawData.typeMatches.forEach((typeMatch: any) => {
-            if (typeMatch.seriesMatches) {
-                typeMatch.seriesMatches.forEach((seriesMatch: any) => {
-                    if (seriesMatch.seriesAdWrapper && seriesMatch.seriesAdWrapper.matches) {
-                        seriesMatch.seriesAdWrapper.matches.forEach((match: any) => {
-                            const matchInfo = match.matchInfo;
-                            processedMatches.push({
-                                seriesName: matchInfo.seriesName,
-                                matchDescription: matchInfo.matchDesc,
-                                matchFormat: matchInfo.matchFormat,
-                                status: matchInfo.status,
-                                team1Name: matchInfo.team1.teamName,
-                                team2Name: matchInfo.team2.teamName,
-                                venue: `${matchInfo.venueInfo.ground}, ${matchInfo.venueInfo.city}`
-                            });
-                        });
-                    } else if (seriesMatch.matches) {
-                        seriesMatch.matches.forEach((match: any) => {
-                              const matchInfo = match.matchInfo;
-                              processedMatches.push({
-                                seriesName: matchInfo.seriesName,
-                                matchDescription: matchInfo.matchDesc,
-                                matchFormat: matchInfo.matchFormat,
-                                status: matchInfo.status,
-                                team1Name: matchInfo.team1.teamName,
-                                team2Name: matchInfo.team2.teamName,
-                                venue: `${matchInfo.venueInfo.ground}, ${matchInfo.venueInfo.city}`
-                              });
-                        });
-                    }
-                });
-            }
-        });
+
+    if (!rawData || !Array.isArray(rawData.typeMatches)) {
+      console.warn("Cricbuzz API response is not in the expected format or typeMatches is missing.");
+      return [];
+    }
+
+    for (const typeMatch of rawData.typeMatches) {
+      if (!typeMatch || !Array.isArray(typeMatch.seriesMatches)) {
+        continue;
+      }
+
+      for (const seriesMatch of typeMatch.seriesMatches) {
+        // The actual matches are nested inside seriesAdWrapper
+        if (!seriesMatch || !seriesMatch.seriesAdWrapper || !Array.isArray(seriesMatch.seriesAdWrapper.matches)) {
+          continue;
+        }
+
+        for (const match of seriesMatch.seriesAdWrapper.matches) {
+          const { matchInfo } = match;
+
+          if (
+            matchInfo &&
+            matchInfo.seriesName &&
+            matchInfo.matchDesc &&
+            matchInfo.status &&
+            matchInfo.team1 &&
+            matchInfo.team1.teamName &&
+            matchInfo.team2 &&
+            matchInfo.team2.teamName &&
+            matchInfo.venueInfo &&
+            matchInfo.venueInfo.ground &&
+            matchInfo.venueInfo.city
+          ) {
+            processedMatches.push({
+              seriesName: matchInfo.seriesName,
+              matchDescription: matchInfo.matchDesc,
+              matchFormat: matchInfo.matchFormat,
+              status: matchInfo.status,
+              team1Name: matchInfo.team1.teamName,
+              team2Name: matchInfo.team2.teamName,
+              venue: `${matchInfo.venueInfo.ground}, ${matchInfo.venueInfo.city}`,
+            });
+          }
+        }
+      }
     }
     
     // Return a limited number of matches to keep the AI processing focused.
