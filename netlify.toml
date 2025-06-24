@@ -6,8 +6,8 @@
   command = "npm run build"
   publish = ".next"
 
+[functions]
+  included_files = ["src/data/player-data.csv"]
+
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-
-  [plugins.inputs]
-    included_files = ["src/data/player-data.csv"]
