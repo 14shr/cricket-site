@@ -15,10 +15,10 @@ export function NavigationHeader() {
             <Link href="/">Home</Link>
           </Button>
           <Button asChild variant="ghost" className="rounded-full h-8 px-4" disabled>
-            <Link href="#">Players</Link>
+            <Link href="#">Scores</Link>
           </Button>
           <Button asChild variant="ghost" className="rounded-full h-8 px-4" disabled>
-            <Link href="#">Teams</Link>
+            <Link href="#">News</Link>
           </Button>
         </nav>
       </div>
