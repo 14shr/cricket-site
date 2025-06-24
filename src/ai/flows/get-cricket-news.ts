@@ -9,12 +9,12 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'zod';
-import { fetchRecentMatches } from '@/lib/news-tool';
+import { getRecentMatches } from '@/lib/news-tool';
 
 // --- OUTPUT SCHEMA (Remains the same to fit the UI) ---
 
 const NewsArticleSchema = z.object({
-    headline: z.string().describe("A catchy headline summarizing the match result."),
+    headline: z.string().describe("A headline summarizing the match result."),
     summary: z.string().describe("A brief summary of the match, including the result and key details."),
     source: z.string().describe("The name of the news source (e.g., Cricbuzz)."),
     url: z.string().describe("A direct URL to a relevant cricket website."),
@@ -34,28 +34,6 @@ export async function getNews(): Promise<GetNewsOutput> {
   return getNewsFlow();
 }
 
-// --- GENKIT PROMPT ---
-
-const getNewsPrompt = ai.definePrompt({
-  name: 'getNewsPrompt',
-  tools: [fetchRecentMatches],
-  output: { schema: GetNewsOutputSchema },
-  prompt: `You are a cricket news editor. Your task is to generate news articles based on recent match results.
-
-1.  You MUST call the \`fetchRecentMatches\` tool to get a list of recently completed cricket matches.
-2.  From the matches returned by the tool, select up to 5 of the most interesting ones.
-3.  For each selected match, you MUST generate a news article and format it into the required JSON output.
-    -   'headline' should be a catchy news headline based on the match result (e.g., "India outplay England in a thriller" or "Australia clinch the series against South Africa"). Use the team names and the 'status' field.
-    -   'summary' should be a brief paragraph describing the match outcome. Mention the series, the teams, the venue, and the final result from the 'status' field.
-    -   'source' MUST be "Cricbuzz".
-    -   'url' MUST be "https://www.cricbuzz.com/".
-    -   'image' MUST be a placeholder: https://placehold.co/600x400.png.
-4.  Your final response MUST be in the specified JSON format.
-
-If the tool returns no matches, you MUST return an empty array for "articles" and a summary message saying "Could not find any recent cricket matches."`,
-});
-
-
 // --- GENKIT FLOW ---
 
 const getNewsFlow = ai.defineFlow(
@@ -65,11 +43,27 @@ const getNewsFlow = ai.defineFlow(
   },
   async () => {
     try {
-      const { output } = await getNewsPrompt({});
-      if (!output) {
-          return { articles: [], summary: "Could not retrieve news from the AI model." };
+      const matches = await getRecentMatches();
+      
+      if (!matches || matches.length === 0) {
+        return { articles: [], summary: "Could not find any recent cricket matches." };
       }
-      return output;
+
+      const articles = matches.map(match => {
+        return {
+          headline: match.status,
+          summary: `The ${match.matchDescription} of the ${match.seriesName} between ${match.team1Name} and ${match.team2Name} took place at ${match.venue}.`,
+          source: "Cricbuzz",
+          url: "https://www.cricbuzz.com/",
+          image: 'https://placehold.co/600x400.png',
+        };
+      });
+
+      return {
+        articles,
+        summary: "Displaying latest match results."
+      };
+
     } catch(e: any) {
         console.error("Error in getNewsFlow:", e);
         return {
