@@ -107,6 +107,29 @@ function getTemporaryStats(playerInfo: { name: string; image: string | null; rol
 // --- EXPORTED ACTION FUNCTION ---
 
 export async function disambiguatePlayerStats(input: DisambiguatePlayerStatsInput): Promise<DisambiguatePlayerStatsOutput> {
+  // Gracefully handle missing API key in production
+  if (!process.env.GOOGLE_API_KEY && !process.env.GEMINI_API_KEY) {
+    console.warn("Google AI API key is not set. Falling back to CSV data only.");
+    try {
+      const csvPlayerData = await getPlayerFromCSV(input.playerName);
+      if (!csvPlayerData) {
+        return {
+          summary: `Could not find player "${input.playerName}" in the data file. Please check the spelling or try a different name.`,
+        };
+      }
+      const temporaryStats = getTemporaryStats(csvPlayerData);
+      return {
+          playerStats: temporaryStats,
+          summary: temporaryStats.summary,
+      }
+    } catch (e: any) {
+        console.error("Error during fallback CSV lookup:", e);
+        return {
+            summary: e.message || "An unexpected error occurred while fetching player stats from fallback."
+        }
+    }
+  }
+  // If key exists, proceed with the AI flow
   return disambiguatePlayerStatsFlow(input);
 }
 
