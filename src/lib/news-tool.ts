@@ -1,56 +1,95 @@
 'use server';
 
 /**
- * @fileOverview A Genkit tool for fetching top cricket news headlines from NewsAPI.
+ * @fileOverview A Genkit tool for fetching recent cricket matches from the Cricbuzz API.
  *
- * - fetchCricketNews: A tool that can be used by an AI model to get cricket news.
+ * - fetchRecentMatches: A tool that can be used by an AI model to get recent match data.
  */
 
 import { ai } from '@/ai/genkit';
 import axios from 'axios';
 import { z } from 'zod';
 
-const NewsApiArticleSchema = z.object({
-  source: z.object({
-    id: z.string().nullable(),
-    name: z.string(),
-  }),
-  author: z.string().nullable(),
-  title: z.string(),
-  description: z.string().nullable(),
-  url: z.string(),
-  urlToImage: z.string().nullable(),
-  publishedAt: z.string(),
-  content: z.string().nullable(),
+const RecentMatchSchema = z.object({
+  seriesName: z.string().describe("The name of the series or tournament."),
+  matchDescription: z.string().describe("The description of the match (e.g., '1st T20I')."),
+  matchFormat: z.string().describe("The format of the match (e.g., 'T20', 'ODI', 'Test')."),
+  status: z.string().describe("The result or current status of the match."),
+  team1Name: z.string().describe("The name of the first team."),
+  team2Name: z.string().describe("The name of the second team."),
+  venue: z.string().describe("The venue where the match was played."),
 });
 
-const FetchCricketNewsOutputSchema = z.array(NewsApiArticleSchema);
+const FetchRecentMatchesOutputSchema = z.array(RecentMatchSchema);
 
-export const fetchCricketNews = ai.defineTool(
+export const fetchRecentMatches = ai.defineTool(
   {
-    name: 'fetchCricketNews',
-    description: 'Fetches top cricket headlines from India from the NewsAPI.',
-    outputSchema: FetchCricketNewsOutputSchema,
+    name: 'fetchRecentMatches',
+    description: 'Fetches recent cricket matches from the Cricbuzz API.',
+    outputSchema: FetchRecentMatchesOutputSchema,
   },
   async () => {
-    const apiKey = process.env.NEWS_API_KEY;
+    const apiKey = process.env.RAPIDAPI_KEY;
     if (!apiKey) {
-      console.error('NEWS_API_KEY is not set in the environment.');
-      throw new Error('News API key is not configured.');
+      console.error('RAPIDAPI_KEY is not set in the environment.');
+      throw new Error('RapidAPI key is not configured.');
     }
-    const url = `https://newsapi.org/v2/top-headlines?country=in&category=sports&q=cricket&apiKey=${apiKey}`;
+    
+    const options = {
+      method: 'GET',
+      url: 'https://cricbuzz-cricket.p.rapidapi.com/matches/v1/recent',
+      headers: {
+        'x-rapidapi-key': apiKey,
+        'x-rapidapi-host': 'cricbuzz-cricket.p.rapidapi.com'
+      }
+    };
+
     try {
-      const response = await axios.get(url);
+      const response = await axios.request(options);
+      const rawData = response.data;
       
-      if (response.data.status !== 'ok') {
-          console.error('NewsAPI request failed:', response.data.message);
-          return [];
+      const processedMatches: z.infer<typeof RecentMatchSchema>[] = [];
+      
+      if (rawData.typeMatches) {
+          rawData.typeMatches.forEach((typeMatch: any) => {
+              if (typeMatch.seriesMatches) {
+                  typeMatch.seriesMatches.forEach((seriesMatch: any) => {
+                      if (seriesMatch.seriesAdWrapper && seriesMatch.seriesAdWrapper.matches) {
+                          seriesMatch.seriesAdWrapper.matches.forEach((match: any) => {
+                              const matchInfo = match.matchInfo;
+                              processedMatches.push({
+                                  seriesName: matchInfo.seriesName,
+                                  matchDescription: matchInfo.matchDesc,
+                                  matchFormat: matchInfo.matchFormat,
+                                  status: matchInfo.status,
+                                  team1Name: matchInfo.team1.teamName,
+                                  team2Name: matchInfo.team2.teamName,
+                                  venue: `${matchInfo.venueInfo.ground}, ${matchInfo.venueInfo.city}`
+                              });
+                          });
+                      } else if (seriesMatch.matches) {
+                          seriesMatch.matches.forEach((match: any) => {
+                               const matchInfo = match.matchInfo;
+                               processedMatches.push({
+                                  seriesName: matchInfo.seriesName,
+                                  matchDescription: matchInfo.matchDesc,
+                                  matchFormat: matchInfo.matchFormat,
+                                  status: matchInfo.status,
+                                  team1Name: matchInfo.team1.teamName,
+                                  team2Name: matchInfo.team2.teamName,
+                                  venue: `${matchInfo.venueInfo.ground}, ${matchInfo.venueInfo.city}`
+                               });
+                          });
+                      }
+                  });
+              }
+          });
       }
       
-      return response.data.articles || [];
+      // Return a limited number of matches to keep the AI processing focused.
+      return processedMatches.slice(0, 10);
     } catch (error) {
-      console.error('Error fetching from NewsAPI:', error);
-      // Return an empty array to prevent the entire flow from failing.
+      console.error('Error fetching from Cricbuzz API:', error);
       return [];
     }
   }
