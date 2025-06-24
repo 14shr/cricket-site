@@ -1,7 +1,7 @@
 'use server';
 
 import * as cheerio from 'cheerio';
-const search = require('google-sr');
+import search from 'google-sr';
 
 const safeParseNumber = (str: string | undefined): number => {
     if (!str || str.trim() === '-') return 0;
@@ -29,7 +29,7 @@ export interface ScrapedData {
 }
 
 export async function scrapePlayerStats(playerName: string): Promise<ScrapedData> {
-    const query = `${playerName} cricbuzz`;
+    const query = `${playerName} cricbuzz profile`;
     let profileLink: string | null = null;
     
     try {
