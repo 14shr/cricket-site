@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import type { DisambiguatePlayerStatsOutput } from '@/ai/flows/disambiguate-player-stats';
-import { getPlayerStatsAction, getLiveMatchesAction } from '@/app/actions';
+import { getPlayerStatsAction, getLiveMatchesAction, getLatestVideosAction } from '@/app/actions';
 import { SearchForm } from '@/components/search-form';
 import { PlayerStatsTable } from '@/components/player-stats-table';
 import { LoadingSkeleton } from '@/components/loading-skeleton';
@@ -11,6 +11,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import { LiveMatches } from '@/components/live-matches';
 import { Skeleton } from '@/components/ui/skeleton';
+import { LatestVideos, LatestVideosSkeleton } from '@/components/latest-videos';
 
 export default function CricketStatsClient() {
   const [loading, setLoading] = useState(false);
@@ -18,25 +19,42 @@ export default function CricketStatsClient() {
   const [data, setData] = useState<DisambiguatePlayerStatsOutput | null>(null);
   const [liveMatches, setLiveMatches] = useState<string[] | null>(null);
   const [liveMatchesLoading, setLiveMatchesLoading] = useState(true);
+  const [latestVideos, setLatestVideos] = useState<string[] | null>(null);
+  const [videosLoading, setVideosLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
-    async function fetchLiveMatches() {
+    async function fetchInitialData() {
       setLiveMatchesLoading(true);
-      const result = await getLiveMatchesAction();
-      if (result.error) {
-        console.error(result.error);
+      const liveMatchesResult = await getLiveMatchesAction();
+      if (liveMatchesResult.error) {
+        console.error(liveMatchesResult.error);
         toast({
           variant: 'destructive',
           title: 'Could not fetch live matches.',
-          description: result.error,
+          description: liveMatchesResult.error,
         });
       } else {
-        setLiveMatches(result.data);
+        setLiveMatches(liveMatchesResult.data);
       }
       setLiveMatchesLoading(false);
+
+      setVideosLoading(true);
+      const videosResult = await getLatestVideosAction();
+      if (videosResult.error) {
+          console.error(videosResult.error);
+          toast({
+              variant: 'destructive',
+              title: 'Could not fetch videos.',
+              description: videosResult.error,
+          });
+          setLatestVideos([]);
+      } else {
+          setLatestVideos(videosResult.data);
+      }
+      setVideosLoading(false);
     }
-    fetchLiveMatches();
+    fetchInitialData();
   }, [toast]);
 
   const handleSearch = async (playerName: string) => {
@@ -99,6 +117,8 @@ export default function CricketStatsClient() {
       )}
       
       {liveMatchesLoading ? renderLiveMatchesLoader() : liveMatches && <LiveMatches matches={liveMatches} />}
+      
+      {videosLoading ? <LatestVideosSkeleton /> : latestVideos && <LatestVideos videos={latestVideos} />}
     </div>
   );
 }

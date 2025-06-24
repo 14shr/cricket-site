@@ -3,6 +3,7 @@
 import { z } from 'zod';
 import { disambiguatePlayerStats, type DisambiguatePlayerStatsOutput } from '@/ai/flows/disambiguate-player-stats';
 import { getLiveMatches as fetchLiveMatches } from '@/lib/live-scraper';
+import { getLatestVideos } from '@/lib/youtube-scraper';
 
 const PlayerStatsActionSchema = z.object({
   playerName: z.string().min(2, { message: "Player name must be at least 2 characters." }),
@@ -48,6 +49,27 @@ export async function getLiveMatchesAction(): Promise<LiveMatchesActionState> {
         const errorMessage = e instanceof Error ? e.message : "An unexpected error occurred.";
         return {
             error: `Failed to retrieve live matches. ${errorMessage}`
+        };
+    }
+}
+
+
+type LatestVideosActionState = {
+    data?: string[] | null;
+    error?: string | null;
+}
+
+const ACC_CHANNEL_URL = 'https://www.youtube.com/@AsianCricketCouncilTV';
+
+export async function getLatestVideosAction(): Promise<LatestVideosActionState> {
+    try {
+        const videos = await getLatestVideos(ACC_CHANNEL_URL);
+        return { data: videos };
+    } catch (e) {
+        console.error(e);
+        const errorMessage = e instanceof Error ? e.message : "An unexpected error occurred.";
+        return {
+            error: `Failed to retrieve latest videos. ${errorMessage}`
         };
     }
 }
