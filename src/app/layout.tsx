@@ -3,8 +3,8 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'CricStats Central',
-  description: 'AI-powered cricket player statistics.',
+  title: 'FootyStats Finder',
+  description: 'AI-powered football player statistics.',
 };
 
 export default function RootLayout({

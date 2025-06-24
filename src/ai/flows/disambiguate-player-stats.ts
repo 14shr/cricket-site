@@ -1,7 +1,7 @@
 'use server';
 
 /**
- * @fileOverview This file defines a flow to get player stats by scraping cricbuzz.
+ * @fileOverview This file defines a flow to get football player stats by scraping fbref.com.
  *
  * It takes a player name as input and returns the player statistics.
  * @param {DisambiguatePlayerStatsInput} input - The input data containing the player name.
@@ -18,16 +18,15 @@ const DisambiguatePlayerStatsInputSchema = z.object({
 export type DisambiguatePlayerStatsInput = z.infer<typeof DisambiguatePlayerStatsInputSchema>;
 
 const PlayerStatsSchema = z.object({
-  name: z.string().describe('The full name of the player and format.'),
-  matches: z.number().describe('Number of matches played.'),
-  runs: z.number().describe('Total runs scored.'),
-  wickets: z.number().describe('Total wickets taken.'),
-  average: z.number().describe('Batting average.'),
+  name: z.string().describe('The full name of the player.'),
+  appearances: z.number().describe('Total career appearances.'),
+  goals: z.number().describe('Total career goals.'),
+  assists: z.number().describe('Total career assists.'),
 });
 
 const DisambiguatePlayerStatsOutputSchema = z.object({
-  playerStats: PlayerStatsSchema.array().describe('Statistics for the player, broken down by format.'),
-  disambiguation_summary: z.string().describe('A summary of where the data was sourced from.'),
+  playerStats: PlayerStatsSchema.optional(),
+  summary: z.string().describe('A summary of where the data was sourced from.'),
 });
 
 export type DisambiguatePlayerStatsOutput = z.infer<typeof DisambiguatePlayerStatsOutputSchema>;
@@ -45,37 +44,22 @@ const disambiguatePlayerStatsFlow = ai.defineFlow(
   async (input) => {
     const scrapedData = await scrapePlayerStats(input.playerName);
     
-    const playerStats = Object.entries(scrapedData.statsByFormat)
-        .map(([format, stats]) => {
-            if (stats.batting.matches > 0 || stats.bowling.wickets > 0) {
-                return {
-                    name: `${scrapedData.name} (${format.toUpperCase()})`,
-                    matches: stats.batting.matches,
-                    runs: stats.batting.runs,
-                    wickets: stats.bowling.wickets,
-                    average: stats.batting.average,
-                };
-            }
-            return null;
-        })
-        .filter((p): p is NonNullable<typeof p> => p !== null);
-
-    if (playerStats.length === 0 && scrapedData.name) {
-        return {
-            playerStats: [{
-                name: scrapedData.name,
-                matches: 0,
-                runs: 0,
-                wickets: 0,
-                average: 0
-            }],
-            disambiguation_summary: `${scrapedData.summary} However, no detailed statistics were found for major formats.`
-        }
+    const playerStats = {
+        name: scrapedData.name,
+        appearances: scrapedData.stats.appearances,
+        goals: scrapedData.stats.goals,
+        assists: scrapedData.stats.assists,
+    };
+    
+    if (!playerStats.name) {
+      return {
+        summary: "Could not find player.",
+      }
     }
 
     return {
       playerStats: playerStats,
-      disambiguation_summary: scrapedData.summary,
+      summary: scrapedData.summary,
     };
   }
 );

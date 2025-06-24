@@ -1,4 +1,4 @@
-import CricStatsClient from './cric-stats-client';
+import FootballStatsClient from './cric-stats-client';
 
 export default function Home() {
   return (
@@ -6,13 +6,13 @@ export default function Home() {
       <div className="w-full max-w-4xl space-y-8">
         <header className="text-center">
           <h1 className="font-headline text-4xl font-bold tracking-tight text-primary sm:text-5xl md:text-6xl">
-            CricStats Central
+            FootyStats Finder
           </h1>
           <p className="mt-4 text-lg text-foreground/80">
             Enter a player's name to get their career statistics, powered by AI.
           </p>
         </header>
-        <CricStatsClient />
+        <FootballStatsClient />
       </div>
     </main>
   );

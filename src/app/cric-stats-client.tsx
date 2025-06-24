@@ -13,7 +13,7 @@ import { LiveMatches } from '@/components/live-matches';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export default function CricStatsClient() {
+export default function FootballStatsClient() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<DisambiguatePlayerStatsOutput | null>(null);
@@ -56,7 +56,7 @@ export default function CricStatsClient() {
       });
     } else {
       setData(result.data);
-      if(result.data?.playerStats.length === 0) {
+      if(!result.data?.playerStats) {
         toast({
           title: 'No players found',
           description: `Could not find any players matching the name "${playerName}".`
