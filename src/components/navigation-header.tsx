@@ -37,8 +37,12 @@ export function NavigationHeader() {
           >
             <Link href="/stadium">Stadium</Link>
           </Button>
-          <Button asChild variant="ghost" className="rounded-full h-8 px-3 text-xs sm:px-4 sm:text-sm text-secondary-foreground" disabled>
-            <Link href="#">News</Link>
+          <Button
+            asChild
+            variant={pathname === '/calendar' ? 'secondary' : 'ghost'}
+            className="rounded-full h-8 px-3 text-xs sm:px-4 sm:text-sm text-secondary-foreground"
+          >
+            <Link href="/calendar">Calendar</Link>
           </Button>
         </nav>
       </div>
