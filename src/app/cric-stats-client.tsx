@@ -70,7 +70,7 @@ export default function CricketStatsClient() {
     <main className="flex-1">
       {/* Hero Section */}
       <section className="w-full py-12 text-center md:py-20 lg:py-24 bg-background">
-        <div className="container px-4 md:px-6">
+        <div className="container mx-auto px-4 md:px-6">
           <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
             Welcome to CricStats Central
           </h1>
