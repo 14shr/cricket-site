@@ -19,10 +19,16 @@ export default function StadiumClient() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col items-center justify-center text-center p-8 border-2 border-dashed rounded-lg h-96 bg-muted">
-            <p className="text-muted-foreground">
-              3D Stadium rendering is coming soon!
-            </p>
+          <div className="sketchfab-embed-wrapper aspect-[4/3] w-full rounded-lg overflow-hidden border">
+            <iframe 
+                title="Cricket stadium" 
+                frameBorder="0" 
+                allowFullScreen 
+                allow="autoplay; fullscreen; xr-spatial-tracking" 
+                src="https://sketchfab.com/models/b4b9964dacc9444e8a265a81fca22afb/embed?autostart=1"
+                className="w-full h-full"
+            >
+            </iframe>
           </div>
         </CardContent>
       </Card>
