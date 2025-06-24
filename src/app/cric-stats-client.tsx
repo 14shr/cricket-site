@@ -89,8 +89,8 @@ export default function CricketStatsClient() {
 
       {/* Main content area */}
       <div className="container mx-auto px-4 md:px-6 py-12 space-y-12">
-        {/* This container will hold either the feature cards or the search results */}
-        <div className="min-h-[250px]">
+        {/* This container will hold the search results */}
+        <div className="min-h-0">
           {loading && <LoadingSkeleton />}
 
           {error && !loading && (
@@ -101,37 +101,38 @@ export default function CricketStatsClient() {
             </Alert>
           )}
           
-          {data && !loading ? (
-              <PlayerStatsTable data={data} />
-          ) : !loading && !error && (
-              <div className="grid gap-6 lg:grid-cols-3">
-                  <Card>
-                      <CardHeader>
-                          <CardTitle>Live Scores</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                          <p className="text-sm text-muted-foreground">Stay updated with real-time match scores and updates.</p>
-                      </CardContent>
-                  </Card>
-                  <Card>
-                      <CardHeader>
-                          <CardTitle>Player Stats</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                          <p className="text-sm text-muted-foreground">Access detailed stats and profiles of your favorite players.</p>
-                      </CardContent>
-                  </Card>
-                  <Card>
-                      <CardHeader>
-                          <CardTitle>Match Calendar</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                          <p className="text-sm text-muted-foreground">View upcoming fixtures and previous results.</p>
-                      </CardContent>
-                  </Card>
-              </div>
-          )}
+          {data && !loading && <PlayerStatsTable data={data} />}
         </div>
+        
+        {/* Show feature cards if there is no data to display */}
+        {!data && !loading && !error && (
+            <div className="grid gap-6 lg:grid-cols-3">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Live Scores</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-sm text-muted-foreground">Stay updated with real-time match scores and updates.</p>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Player Stats</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-sm text-muted-foreground">Access detailed stats and profiles of your favorite players.</p>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Match Calendar</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-sm text-muted-foreground">View upcoming fixtures and previous results.</p>
+                    </CardContent>
+                </Card>
+            </div>
+        )}
       </div>
 
       {/* Highlights Section */}
