@@ -11,6 +11,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import { LatestVideos, LatestVideosSkeleton } from '@/components/latest-videos';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import Link from 'next/link';
 
 export default function CricketStatsClient() {
   const [loading, setLoading] = useState(false);
@@ -106,15 +107,17 @@ export default function CricketStatsClient() {
         
         {/* Show feature cards */}
         <div className="grid gap-6 md:grid-cols-3">
-            <Card>
-                <CardHeader>
-                    <CardTitle>Live Scores</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <p className="text-sm text-muted-foreground">Stay updated with real-time match scores and updates.</p>
-                </CardContent>
-            </Card>
-            <Card>
+            <Link href="/scores" className="block hover:scale-105 transition-transform duration-200">
+                <Card className="h-full">
+                    <CardHeader>
+                        <CardTitle>Live Scores</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-sm text-muted-foreground">Stay updated with real-time match scores and updates.</p>
+                    </CardContent>
+                </Card>
+            </Link>
+            <Card className="h-full">
                 <CardHeader>
                     <CardTitle>Player Stats</CardTitle>
                 </CardHeader>
@@ -122,7 +125,7 @@ export default function CricketStatsClient() {
                     <p className="text-sm text-muted-foreground">Access detailed stats and profiles of your favorite players.</p>
                 </CardContent>
             </Card>
-            <Card>
+            <Card className="h-full">
                 <CardHeader>
                     <CardTitle>Match Calendar</CardTitle>
                 </CardHeader>

@@ -1,0 +1,66 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { getLiveMatchesAction } from '@/app/actions';
+import { LiveMatchesList } from '@/components/live-matches-list';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertCircle, Tv } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+
+export default function ScoresClient() {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [matches, setMatches] = useState<string[] | null>(null);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    async function fetchLiveScores() {
+      setLoading(true);
+      setError(null);
+      const result = await getLiveMatchesAction();
+      if (result.error) {
+        setError(result.error);
+        toast({
+          variant: 'destructive',
+          title: 'Could not fetch live scores.',
+          description: result.error,
+        });
+      } else {
+        setMatches(result.data);
+      }
+      setLoading(false);
+    }
+    fetchLiveScores();
+  }, [toast]);
+
+  return (
+    <div className="container mx-auto px-4 md:px-6 py-12">
+      <div className="flex items-center gap-4 mb-8">
+        <Tv className="h-8 w-8 text-primary" />
+        <h1 className="text-3xl font-bold tracking-tighter font-headline sm:text-4xl md:text-5xl">Live Cricket Scores</h1>
+      </div>
+
+      {loading && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Skeleton className="h-28 w-full rounded-lg" />
+          <Skeleton className="h-28 w-full rounded-lg" />
+          <Skeleton className="h-28 w-full rounded-lg" />
+          <Skeleton className="h-28 w-full rounded-lg" />
+          <Skeleton className="h-28 w-full rounded-lg" />
+          <Skeleton className="h-28 w-full rounded-lg" />
+        </div>
+      )}
+
+      {error && !loading && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+      
+      {matches && !loading && <LiveMatchesList matches={matches} />}
+    </div>
+  );
+}
