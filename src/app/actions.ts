@@ -59,11 +59,9 @@ type LatestVideosActionState = {
     error?: string | null;
 }
 
-const ACC_CHANNEL_URL = 'https://www.youtube.com/@AsianCricketCouncilTV';
-
 export async function getLatestVideosAction(): Promise<LatestVideosActionState> {
     try {
-        const videos = await getLatestVideos(ACC_CHANNEL_URL);
+        const videos = await getLatestVideos();
         return { data: videos };
     } catch (e) {
         console.error(e);

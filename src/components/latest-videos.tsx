@@ -17,12 +17,12 @@ export function LatestVideos({ videos }: LatestVideosProps) {
                     <span>Latest Videos</span>
                 </CardTitle>
                 <CardDescription>
-                    {hasVideos ? 'Highlights and clips from the Asian Cricket Council.' : 'Could not load videos at the moment.'}
+                    {hasVideos ? 'Highlights and clips from YouTube.' : 'Could not load videos at the moment.'}
                 </CardDescription>
             </CardHeader>
             {hasVideos && (
                  <CardContent>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {videos.map((videoUrl, index) => (
                             <div key={index} className="aspect-video w-full">
                                 <iframe
@@ -50,7 +50,8 @@ export function LatestVideosSkeleton() {
                 <Skeleton className="h-4 w-64 mt-2 bg-muted/80" />
             </CardHeader>
             <CardContent>
-                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Skeleton className="w-full bg-muted/80 rounded-lg aspect-video" />
                     <Skeleton className="w-full bg-muted/80 rounded-lg aspect-video" />
                     <Skeleton className="w-full bg-muted/80 rounded-lg aspect-video" />
                 </div>
