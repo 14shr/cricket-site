@@ -71,7 +71,7 @@ export default function CricketStatsClient() {
       {/* Hero Section */}
       <section 
         className="w-full py-12 text-center md:py-20 lg:py-24 bg-cover bg-center relative"
-        style={{ backgroundImage: "url('https://i.ibb.co/L5k9X4r/image.png')" }}
+        style={{ backgroundImage: "url('https://i.postimg.cc/PJdX0NQS/rugby-sport-environment-filed.jpg')" }}
       >
         <div className="absolute inset-0 bg-black bg-opacity-60"></div>
         <div className="container relative mx-auto px-4 md:px-6">
