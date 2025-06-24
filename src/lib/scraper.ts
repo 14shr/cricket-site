@@ -29,7 +29,7 @@ export interface ScrapedData {
 }
 
 export async function scrapePlayerStats(playerName: string): Promise<ScrapedData> {
-    const query = `site:cricbuzz.com/profiles/ ${playerName}`;
+    const query = `${playerName} cricbuzz`;
     let profileLink: string | null = null;
     
     try {
