@@ -129,7 +129,16 @@ export async function getPlayerFromCSV(playerName: string): Promise<PlayerStats 
     const fileContent = await fs.readFile(filePath, 'utf-8');
     const players = parseCSV(fileContent);
 
-    const player = players.find(p => p['Name'] && p['Name'].toLowerCase() === playerName.toLowerCase());
+    const searchTerms = playerName.toLowerCase().split(' ').filter(t => t.length > 0);
+
+    const player = players.find(p => {
+      if (!p['Name']) {
+        return false;
+      }
+      const csvPlayerName = p['Name'].toLowerCase();
+      // Check if every search term is included in the player's name
+      return searchTerms.every(term => csvPlayerName.includes(term));
+    });
     
     if (player) {
       return mapRowToPlayerStats(player);
