@@ -16,8 +16,8 @@ const NewsArticleSchema = z.object({
     headline: z.string().describe("The main headline of the news article."),
     summary: z.string().describe("A brief summary of the news article."),
     source: z.string().describe("The name of the news source (e.g., ESPN, Cricbuzz)."),
-    url: z.string().url().describe("The direct URL to the full article."),
-    image: z.string().url().describe("A URL for a relevant image for the article. Use a placeholder if no real image is available."),
+    url: z.string().describe("The direct URL to the full article."),
+    image: z.string().describe("A URL for a relevant image for the article. Use a placeholder if no real image is available."),
 });
 
 const GetNewsOutputSchema = z.object({
