@@ -42,7 +42,7 @@ function parseCSV(csv: string): Record<string, string>[] {
 function mapRowToPlayerStats(row: Record<string, string>): PlayerStats {
   return {
     name: row['fullname'] || 'N/A',
-    country: row['country'] || 'N/A',
+    country: 'N/A', // Set to N/A as the CSV structure does not contain country info
     role: row['position'] || 'N/A',
     image: row['image_path'] || null,
     summary: `Found player data for ${row['fullname']} in the local CSV file.`,
