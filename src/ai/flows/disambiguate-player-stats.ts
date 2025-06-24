@@ -1,7 +1,7 @@
 'use server';
 
 /**
- * @fileOverview This file defines a flow to get cricket player stats by scraping Cricbuzz.
+ * @fileOverview This file defines a flow to get cricket player stats from a local CSV file.
  *
  * It takes a player name as input and returns detailed player statistics.
  * @param {DisambiguatePlayerStatsInput} input - The input data containing the player name.
@@ -10,7 +10,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'zod';
-import { scrapePlayerStats, type PlayerStats } from '@/lib/scraper';
+import { getPlayerFromCSV } from '@/lib/csv-parser';
 
 const DisambiguatePlayerStatsInputSchema = z.object({
   playerName: z.string().describe('The name of the player to search for.'),
@@ -78,22 +78,22 @@ const disambiguatePlayerStatsFlow = ai.defineFlow(
   },
   async (input) => {
     try {
-      const scrapedData = await scrapePlayerStats(input.playerName);
+      const playerData = await getPlayerFromCSV(input.playerName);
       
-      if (!scrapedData || !scrapedData.name) {
+      if (!playerData) {
         return {
-          summary: "Could not find player data.",
+          summary: `Could not find player "${input.playerName}" in the data file.`,
         }
       }
 
       return {
-        playerStats: scrapedData,
-        summary: scrapedData.summary,
+        playerStats: playerData,
+        summary: playerData.summary,
       };
     } catch(e: any) {
         console.error(e);
         return {
-            summary: e.message || "An unexpected error occurred while fetching player stats."
+            summary: e.message || "An unexpected error occurred while fetching player stats from the CSV."
         }
     }
   }
