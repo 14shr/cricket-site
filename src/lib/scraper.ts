@@ -48,7 +48,7 @@ export async function scrapePlayerStats(playerName: string): Promise<PlayerStats
     let profileLink: string | null = null;
     
     try {
-        const results = await search({ query: query });
+        const results = await search(query);
         const cricbuzzResult = results.find((r: any) => r.link && r.link.includes("cricbuzz.com/profiles/"));
         if (cricbuzzResult) {
             profileLink = cricbuzzResult.link;
