@@ -2,43 +2,26 @@
 
 import { useState, useEffect } from 'react';
 import type { DisambiguatePlayerStatsOutput } from '@/ai/flows/disambiguate-player-stats';
-import { getPlayerStatsAction, getLiveMatchesAction, getLatestVideosAction } from '@/app/actions';
+import { getPlayerStatsAction, getLatestVideosAction } from '@/app/actions';
 import { SearchForm } from '@/components/search-form';
 import { PlayerStatsTable } from '@/components/player-stats-table';
 import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
-import { LiveMatches } from '@/components/live-matches';
-import { Skeleton } from '@/components/ui/skeleton';
 import { LatestVideos, LatestVideosSkeleton } from '@/components/latest-videos';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function CricketStatsClient() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<DisambiguatePlayerStatsOutput | null>(null);
-  const [liveMatches, setLiveMatches] = useState<string[] | null>(null);
-  const [liveMatchesLoading, setLiveMatchesLoading] = useState(true);
   const [latestVideos, setLatestVideos] = useState<string[] | null>(null);
   const [videosLoading, setVideosLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
     async function fetchInitialData() {
-      setLiveMatchesLoading(true);
-      const liveMatchesResult = await getLiveMatchesAction();
-      if (liveMatchesResult.error) {
-        console.error(liveMatchesResult.error);
-        toast({
-          variant: 'destructive',
-          title: 'Could not fetch live matches.',
-          description: liveMatchesResult.error,
-        });
-      } else {
-        setLiveMatches(liveMatchesResult.data);
-      }
-      setLiveMatchesLoading(false);
-
       setVideosLoading(true);
       const videosResult = await getLatestVideosAction();
       if (videosResult.error) {
@@ -83,42 +66,77 @@ export default function CricketStatsClient() {
     setLoading(false);
   };
   
-  const renderLiveMatchesLoader = () => (
-    <div className="w-full">
-      <div className="mb-4">
-        <Skeleton className="h-8 w-48 bg-muted/80" />
-        <Skeleton className="h-4 w-64 mt-2 bg-muted/80" />
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Skeleton className="h-20 w-full bg-muted/80 rounded-lg" />
-        <Skeleton className="h-20 w-full bg-muted/80 rounded-lg" />
-      </div>
-    </div>
-  );
-
   return (
-    <div className="space-y-8">
-      <SearchForm onSubmit={handleSearch} isPending={loading} />
+    <main className="flex-1">
+      {/* Hero Section */}
+      <section className="w-full py-12 text-center md:py-20 lg:py-24 bg-background">
+        <div className="container px-4 md:px-6">
+          <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+            Welcome to CricStats Central
+          </h1>
+          <p className="mx-auto max-w-[700px] mt-4 text-muted-foreground md:text-xl/relaxed">
+            Your hub for the latest cricket news, scores, and stats.
+          </p>
+          <div className="mx-auto mt-6 w-full max-w-sm">
+             <SearchForm onSubmit={handleSearch} isPending={loading} />
+          </div>
+        </div>
+      </section>
 
-      {loading && <LoadingSkeleton />}
+      {/* Main content area */}
+      <div className="container mx-auto px-4 md:px-6 py-12 space-y-12">
+        {/* This container will hold either the feature cards or the search results */}
+        <div className="min-h-[250px]">
+          {loading && <LoadingSkeleton />}
 
-      {error && !loading && (
-         <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>
-            {error}
-          </AlertDescription>
-        </Alert>
-      )}
+          {error && !loading && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          
+          {data && !loading ? (
+              <PlayerStatsTable data={data} />
+          ) : !loading && !error && (
+              <div className="grid gap-6 lg:grid-cols-3">
+                  <Card>
+                      <CardHeader>
+                          <CardTitle>Live Scores</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                          <p className="text-sm text-muted-foreground">Stay updated with real-time match scores and updates.</p>
+                      </CardContent>
+                  </Card>
+                  <Card>
+                      <CardHeader>
+                          <CardTitle>Player Stats</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                          <p className="text-sm text-muted-foreground">Access detailed stats and profiles of your favorite players.</p>
+                      </CardContent>
+                  </Card>
+                  <Card>
+                      <CardHeader>
+                          <CardTitle>Match Calendar</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                          <p className="text-sm text-muted-foreground">View upcoming fixtures and previous results.</p>
+                      </CardContent>
+                  </Card>
+              </div>
+          )}
+        </div>
+      </div>
 
-      {data && !loading && (
-        <PlayerStatsTable data={data} />
-      )}
-      
-      {liveMatchesLoading ? renderLiveMatchesLoader() : liveMatches && <LiveMatches matches={liveMatches} />}
-      
-      {videosLoading ? <LatestVideosSkeleton /> : latestVideos && <LatestVideos videos={latestVideos} />}
-    </div>
+      {/* Highlights Section */}
+      <section className="w-full py-12 md:py-20 bg-muted">
+          <div className="container mx-auto px-4 md:px-6">
+              <h2 className="mb-8 text-3xl font-bold tracking-tighter text-center">Latest Highlights</h2>
+              {videosLoading ? <LatestVideosSkeleton /> : latestVideos && <LatestVideos videos={latestVideos} />}
+          </div>
+      </section>
+    </main>
   );
 }
