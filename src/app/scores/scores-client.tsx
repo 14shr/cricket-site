@@ -44,8 +44,8 @@ export default function ScoresClient() {
           <span>Live Cricket Scores</span>
           {!loading && isLive && (
             <div className="relative flex h-3 w-3">
-                <div className="animate-ping absolute inline-flex h-full w-full rounded-full bg-chart-2 opacity-75" />
-                <div className="relative inline-flex rounded-full h-3 w-3 bg-chart-2" />
+                <div className="animate-ping absolute inline-flex h-full w-full rounded-full bg-chart-2 opacity-75"></div>
+                <div className="relative inline-flex rounded-full h-3 w-3 bg-chart-2"></div>
             </div>
           )}
         </h1>
