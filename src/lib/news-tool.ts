@@ -1,9 +1,9 @@
 'use server';
 
 /**
- * @fileOverview A Genkit tool for fetching top sports news headlines from NewsAPI.
+ * @fileOverview A Genkit tool for fetching top cricket news headlines from NewsAPI.
  *
- * - fetchSportsNews: A tool that can be used by an AI model to get sports news.
+ * - fetchCricketNews: A tool that can be used by an AI model to get cricket news.
  */
 
 import { ai } from '@/ai/genkit';
@@ -24,13 +24,13 @@ const NewsApiArticleSchema = z.object({
   content: z.string().nullable(),
 });
 
-const FetchSportsNewsOutputSchema = z.array(NewsApiArticleSchema);
+const FetchCricketNewsOutputSchema = z.array(NewsApiArticleSchema);
 
-export const fetchSportsNews = ai.defineTool(
+export const fetchCricketNews = ai.defineTool(
   {
-    name: 'fetchSportsNews',
-    description: 'Fetches top sports headlines from India from the NewsAPI.',
-    outputSchema: FetchSportsNewsOutputSchema,
+    name: 'fetchCricketNews',
+    description: 'Fetches top cricket headlines from India from the NewsAPI.',
+    outputSchema: FetchCricketNewsOutputSchema,
   },
   async () => {
     const apiKey = process.env.NEWS_API_KEY;
@@ -38,7 +38,7 @@ export const fetchSportsNews = ai.defineTool(
       console.error('NEWS_API_KEY is not set in the environment.');
       throw new Error('News API key is not configured.');
     }
-    const url = `https://newsapi.org/v2/top-headlines?country=in&category=sports&apiKey=${apiKey}`;
+    const url = `https://newsapi.org/v2/top-headlines?country=in&category=sports&q=cricket&apiKey=${apiKey}`;
     try {
       const response = await axios.get(url);
       

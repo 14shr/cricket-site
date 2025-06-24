@@ -9,7 +9,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'zod';
-import { fetchSportsNews } from '@/lib/news-tool';
+import { fetchCricketNews } from '@/lib/news-tool';
 
 // --- OUTPUT SCHEMA ---
 
@@ -38,22 +38,21 @@ export async function getNews(): Promise<GetNewsOutput> {
 
 const getNewsPrompt = ai.definePrompt({
   name: 'getNewsPrompt',
-  tools: [fetchSportsNews],
+  tools: [fetchCricketNews],
   output: { schema: GetNewsOutputSchema },
   prompt: `You are a cricket news editor. Your task is to provide a list of the top 5 most recent and important cricket news articles.
 
-  1.  You MUST start by calling the \`fetchSportsNews\` tool to get a list of the latest sports headlines.
-  2.  From the articles returned by the tool, you MUST filter them to identify and select ONLY the articles that are about cricket.
-  3.  From the filtered cricket articles, select up to 5 of the most relevant ones.
-  4.  For each selected article, you MUST format it into the required JSON output.
-      -   'headline' should be the article's original title.
-      -   'summary' should be the article's original description.
-      -   'source' should be the name of the news source.
-      -   'url' is the direct URL to the article.
-      -   'image' should be the image URL from the article ('urlToImage'). If no image URL is provided or it's empty, you MUST use a placeholder: https://placehold.co/600x400.png.
-  5.  Your final response MUST be in the specified JSON format.
+1.  You MUST call the \`fetchCricketNews\` tool to get a list of the latest cricket headlines.
+2.  From the articles returned by the tool, select up to 5 of the most relevant ones.
+3.  For each selected article, you MUST format it into the required JSON output.
+    -   'headline' should be the article's original title.
+    -   'summary' should be the article's original description.
+    -   'source' should be the name of the news source.
+    -   'url' is the direct URL to the article.
+    -   'image' should be the image URL from the article ('urlToImage'). If no image URL is provided or it's empty, you MUST use a placeholder: https://placehold.co/600x400.png.
+4.  Your final response MUST be in the specified JSON format.
 
-  If you cannot find any cricket news after filtering, you MUST return an empty array for "articles" and a summary message saying "Could not find any recent cricket news."`,
+If the tool returns no articles, you MUST return an empty array for "articles" and a summary message saying "Could not find any recent cricket news."`,
 });
 
 
