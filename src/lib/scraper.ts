@@ -2,32 +2,56 @@
 
 import * as cheerio from 'cheerio';
 import search from 'google-sr';
+import axios from 'axios';
 
-const safeParseNumber = (str: string | undefined): number => {
-    if (!str || str.trim() === '-') return 0;
-    const num = parseFloat(str.replace(/,/g, ''));
-    return isNaN(num) ? 0 : num;
-};
-
-export interface ScrapedData {
-    name: string;
-    stats: {
-        appearances: number;
-        goals: number;
-        assists: number;
+export interface PlayerStats {
+  name: string;
+  country: string;
+  image: string | null;
+  role: string;
+  rankings: {
+    batting: {
+      test: string;
+      odi: string;
+      t20: string;
     };
-    summary: string;
+    bowling: {
+      test: string;
+      odi: string;
+      t20: string;
+    };
+  };
+  batting_stats: Record<string, {
+    matches: string;
+    runs: string;
+    highest_score: string;
+    average: string;
+    strike_rate: string;
+    hundreds: string;
+    fifties: string;
+  }>;
+  bowling_stats: Record<string, {
+    matches: string;
+    balls: string;
+    runs: string;
+    wickets: string;
+    best_bowling_innings: string;
+    economy: string;
+    five_wickets: string;
+  }>;
+  summary: string;
 }
 
-export async function scrapePlayerStats(playerName: string): Promise<ScrapedData> {
-    const query = `${playerName} fbref`;
+
+export async function scrapePlayerStats(playerName: string): Promise<PlayerStats> {
+    const query = `${playerName} site:cricbuzz.com/profiles`;
     let profileLink: string | null = null;
     
     try {
-        const results = await search({ query });
-        const fbrefResult = results.find((r: any) => r.link && r.link.includes("fbref.com/en/players/"));
-        if (fbrefResult) {
-            profileLink = fbrefResult.link;
+        const results = await search({ query: query });
+        const cricbuzzResult = results.find((r: any) => r.link && r.link.includes("cricbuzz.com/profiles/"));
+        if (cricbuzzResult) {
+            profileLink = cricbuzzResult.link;
         }
     } catch (e: any) {
         console.error("Search failed", e);
@@ -35,54 +59,92 @@ export async function scrapePlayerStats(playerName: string): Promise<ScrapedData
     }
 
     if (!profileLink) {
-        throw new Error(`Could not find an FBref profile for "${playerName}".`);
+        throw new Error(`Could not find a Cricbuzz profile for "${playerName}".`);
     }
 
     let response;
     try {
-        response = await fetch(profileLink);
-        if (!response.ok) {
+        response = await axios.get(profileLink);
+        if (response.status !== 200) {
             throw new Error(`Failed to fetch profile page: ${response.statusText}`);
         }
     } catch (e: any) {
         console.error("Fetch failed", e);
-        throw new Error(`Could not fetch the FBref profile page at ${profileLink}: ${e.message}`);
+        throw new Error(`Could not fetch the Cricbuzz profile page at ${profileLink}: ${e.message}`);
     }
     
-    const html = await response.text();
+    const html = await response.data;
     const $ = cheerio.load(html);
 
-    const name = $('h1[itemprop="name"]').text().trim();
+    const pc = $('div.cb-col.cb-col-100.cb-bg-white');
+
+    const name = pc.find('h1.cb-font-40').text().trim();
     if (!name) {
-         throw new Error(`Could not parse player data from FBref. The page structure may have changed.`);
+         throw new Error(`Could not parse player data from Cricbuzz. The page structure may have changed.`);
     }
+    const country = pc.find('h3.cb-font-18.text-gray').text().trim();
+    const imageUrl = pc.find('img').first().attr('src') ? `https://www.cricbuzz.com${pc.find('img').first().attr('src')}` : null;
 
-    let appearances = 0;
-    let goals = 0;
-    let assists = 0;
+    const personal = $('div.cb-col.cb-col-60.cb-lst-itm-sm');
+    const role = personal.find((i, el) => $(el).text().includes('Role')).next().text().trim();
+    
+    const icc = $('div.cb-col.cb-col-25.cb-plyr-rank.text-right');
+    const tb = icc.eq(0).text().trim() || 'N/A';
+    const ob = icc.eq(1).text().trim() || 'N/A';
+    const twb = icc.eq(2).text().trim() || 'N/A';
+    const tbw = icc.eq(3).text().trim() || 'N/A';
+    const obw = icc.eq(4).text().trim() || 'N/A';
+    const twbw = icc.eq(5).text().trim() || 'N/A';
 
-    const careerRow = $('tfoot tr:contains("Career")');
-    if (careerRow.length > 0) {
-        appearances = safeParseNumber(careerRow.find('td[data-stat="games"]').text());
-        goals = safeParseNumber(careerRow.find('td[data-stat="goals"]').text());
-        assists = safeParseNumber(careerRow.find('td[data-stat="assists"]').text());
-    } else {
-        $('table.stats_table tbody tr').each((i, row) => {
-            if(!$(row).attr('id')) return;
-            appearances += safeParseNumber($(row).find('td[data-stat="games"]').text());
-            goals += safeParseNumber($(row).find('td[data-stat="goals"]').text());
-            assists += safeParseNumber($(row).find('td[data-stat="assists"]').text());
-        })
-    }
+    const summary = $('div.cb-plyr-tbl');
+    const batting = summary.eq(0);
+    const bowling = summary.eq(1);
 
+    const battingStats: PlayerStats['batting_stats'] = {};
+    batting.find('tbody tr').each((_, row) => {
+        const cols = $(row).find('td');
+        const formatName = cols.eq(0).text().trim().toLowerCase();
+        if (formatName) {
+            battingStats[formatName] = {
+                matches: cols.eq(1).text().trim(),
+                runs: cols.eq(3).text().trim(),
+                highest_score: cols.eq(5).text().trim(),
+                average: cols.eq(6).text().trim(),
+                strike_rate: cols.eq(7).text().trim(),
+                hundreds: cols.eq(12).text().trim(),
+                fifties: cols.eq(11).text().trim(),
+            };
+        }
+    });
+
+    const bowlingStats: PlayerStats['bowling_stats'] = {};
+    bowling.find('tbody tr').each((_, row) => {
+        const cols = $(row).find('td');
+        const formatName = cols.eq(0).text().trim().toLowerCase();
+        if (formatName) {
+             bowlingStats[formatName] = {
+                matches: cols.eq(1).text().trim(),
+                balls: cols.eq(3).text().trim(),
+                runs: cols.eq(4).text().trim(),
+                wickets: cols.eq(5).text().trim(),
+                best_bowling_innings: cols.eq(9).text().trim(),
+                economy: cols.eq(7).text().trim(),
+                five_wickets: cols.eq(11).text().trim(),
+            };
+        }
+    });
 
     return {
-        name,
-        stats: {
-            appearances,
-            goals,
-            assists,
-        },
-        summary: `Found career stats for ${name} on FBref.com.`
+      name,
+      country,
+      image: imageUrl,
+      role,
+      rankings: {
+        batting: { test: tb, odi: ob, t20: twb },
+        bowling: { test: tbw, odi: obw, t20: twbw }
+      },
+      batting_stats: battingStats,
+      bowling_stats: bowlingStats,
+      summary: `Found career stats for ${name} on Cricbuzz.com.`
     };
 }

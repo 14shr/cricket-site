@@ -11,7 +11,7 @@ export function LiveMatches({ matches }: LiveMatchesProps) {
       <Card className="shadow-lg backdrop-blur-sm bg-card/80">
         <CardHeader>
           <CardTitle className="font-headline text-2xl flex items-center">
-            <Tv className="mr-2 h-6 w-6 text-accent" /> Live Matches
+            <Tv className="mr-2 h-6 w-6 text-accent" /> Live Cricket Scores
           </CardTitle>
           <CardDescription>No live matches found at the moment.</CardDescription>
         </CardHeader>
@@ -23,7 +23,7 @@ export function LiveMatches({ matches }: LiveMatchesProps) {
     <Card className="shadow-lg backdrop-blur-sm bg-card/80">
       <CardHeader>
         <CardTitle className="font-headline text-2xl flex items-center">
-            <Tv className="mr-2 h-6 w-6 text-accent" /> Live Matches
+            <Tv className="mr-2 h-6 w-6 text-accent" /> Live Cricket Scores
         </CardTitle>
         <CardDescription>Live scores from across the globe.</CardDescription>
       </CardHeader>

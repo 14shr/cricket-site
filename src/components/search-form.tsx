@@ -45,7 +45,7 @@ export function SearchForm({ onSubmit, isPending }: SearchFormProps) {
                 <FormItem className="w-full">
                   <FormLabel className="sr-only">Player Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., Lionel Messi" {...field} />
+                    <Input placeholder="e.g., Virat Kohli" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
