@@ -13,16 +13,16 @@ const STAT_FORMATS = ['test', 'odi', 't20i'];
 const RankingItem = ({ label, rank }: { label: string; rank: string }) => (
   <div className="flex items-center justify-between rounded-md bg-muted/50 p-3">
     <p className="font-medium text-muted-foreground">{label}</p>
-    <Badge variant={rank && rank !== 'N/A' && rank !== '-' ? 'default' : 'secondary'}>
+    <div className="rounded-md bg-background px-3 py-1 text-sm font-semibold">
       {rank || '-'}
-    </Badge>
+    </div>
   </div>
 );
 
 export function PlayerStatsTable({ data }: PlayerStatsTableProps) {
   if (!data || !data.playerStats) {
     return (
-       <Card className="shadow-lg text-center backdrop-blur-sm bg-card/80">
+       <Card className="shadow-lg text-center bg-card">
         <CardHeader>
           <CardTitle className="font-headline text-2xl">No Results</CardTitle>
         </CardHeader>
@@ -40,7 +40,7 @@ export function PlayerStatsTable({ data }: PlayerStatsTableProps) {
 
   return (
     <div className="space-y-8">
-      <Card className="shadow-lg backdrop-blur-sm bg-card/80 overflow-hidden">
+      <Card className="shadow-lg bg-card overflow-hidden">
         <div className="flex flex-col md:flex-row">
           <div className="md:w-1/3 xl:w-1/4 bg-muted">
             <Avatar className="h-full w-full rounded-none">

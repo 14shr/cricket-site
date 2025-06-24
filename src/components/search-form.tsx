@@ -31,7 +31,7 @@ export function SearchForm({ onSubmit, isPending }: SearchFormProps) {
   }
 
   return (
-    <Card className="shadow-lg backdrop-blur-sm bg-card/80">
+    <Card className="shadow-lg bg-card">
       <CardHeader>
         <CardTitle className="font-headline text-2xl">Player Search</CardTitle>
       </CardHeader>

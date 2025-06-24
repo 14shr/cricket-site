@@ -67,7 +67,7 @@ export default function CricketStatsClient() {
   };
   
   const renderLiveMatchesLoader = () => (
-    <Card className="shadow-lg backdrop-blur-sm bg-card/80">
+    <Card className="shadow-lg bg-card">
       <CardHeader>
         <Skeleton className="h-8 w-48 bg-muted/80" />
         <Skeleton className="h-4 w-64 mt-2 bg-muted/80" />
