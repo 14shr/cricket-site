@@ -32,7 +32,7 @@ export function SearchForm({ onSubmit, isPending }: SearchFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="flex items-start gap-2">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="flex items-center gap-2">
         <FormField
           control={form.control}
           name="playerName"
