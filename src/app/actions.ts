@@ -2,6 +2,7 @@
 
 import { z } from 'zod';
 import { disambiguatePlayerStats, type DisambiguatePlayerStatsOutput } from '@/ai/flows/disambiguate-player-stats';
+import { getLiveMatches as fetchLiveMatches } from '@/lib/live-scraper';
 
 const PlayerStatsActionSchema = z.object({
   playerName: z.string().min(2, { message: "Player name must be at least 2 characters." }),
@@ -31,4 +32,22 @@ export async function getPlayerStatsAction(input: { playerName: string }): Promi
       error: `Failed to retrieve player stats. ${errorMessage}`
     };
   }
+}
+
+type LiveMatchesActionState = {
+    data?: string[] | null;
+    error?: string | null;
+}
+
+export async function getLiveMatchesAction(): Promise<LiveMatchesActionState> {
+    try {
+        const matches = await fetchLiveMatches();
+        return { data: matches };
+    } catch (e) {
+        console.error(e);
+        const errorMessage = e instanceof Error ? e.message : "An unexpected error occurred.";
+        return {
+            error: `Failed to retrieve live matches. ${errorMessage}`
+        };
+    }
 }
